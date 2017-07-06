@@ -14,6 +14,7 @@ supportedDevIDs = {
     '0x67b1',
     '0x67b9'
 }
+
 vrm_types = {
     '0x22': 'fsw 1 VDDC',
     '0x23': 'fsw 2 VDDI',
@@ -29,12 +30,26 @@ vrm_types = {
 
 class HawaiiBios:
 
-    def __init__(rom: bytes):
+    def __init__(self, rom: bytes):
         self.rom = rom
+        self.data = {
+            'Overview': [],
+            'Powerplay': [],
+            'VDDCI states': [],
+            'GPU freq table': [],
+            'MEM freq table': [],
+            'Start VCE limit table': [],
+            'Start ACP limit table': [],
+            'Start SAMU limit table': [],
+            'Start UVD limit table': [],
+            'Fan Profile': [],
+            'VRM settings': []
+        }
         self.parse()
 
     def parse(self):
-        print('parsing rom')
+
+        print('parsing rom ...')
 
         self.pos_pciInfoPosition = 24
         self.pciInfoPosition = BytesReader.read_int16(self.rom, self.pos_pciInfoPosition)
@@ -55,64 +70,6 @@ class HawaiiBios:
         self.pos_gpuVRMTablePosition = 68 + self.dataPointersPosition
         self.gpuVRMTablePosition = BytesReader.read_int16(self.rom, self.pos_gpuVRMTablePosition)
         print('gpuVRMTablePosition :', hex(self.gpuVRMTablePosition))
-
-        self.pos_biosName = 220
-        self.biosName = BytesReader.read_str(self.rom, self.pos_biosName, 32)
-        print('biosName :', self.biosName)
-
-        self.pos_devIDstr = 6 + self.pciInfoPosition
-        self.devIDstr = hex(BytesReader.read_int16(self.rom, self.pos_devIDstr))
-        print('devIDstr :', self.devIDstr)
-
-        self.pos_vendorID = 4 + self.pciInfoPosition
-        self.vendorID = hex(BytesReader.read_int16(self.rom, self.pos_vendorID))
-        print('vendorID :', self.vendorID)
-
-        self.pos_productData = 8 + self.pciInfoPosition
-        self.productData = hex(BytesReader.read_int16(self.rom, self.pos_productData))
-        print('productData :', self.productData)
-
-        self.pos_structureLength = 10 + self.pciInfoPosition
-        self.structureLength = hex(BytesReader.read_int16(self.rom, self.pos_structureLength))
-        print('structureLength :', self.structureLength)
-
-        self.pos_structureRevision = 12 + self.pciInfoPosition
-        self.structureRevision = hex(BytesReader.read_int8(self.rom, self.pos_structureRevision))
-        print('structureRevision :', self.structureRevision)
-
-        self.pos1_classCode = 13 + self.pciInfoPosition
-        self.pos2_classCode = 14 + self.pciInfoPosition
-        self.pos3_classCode = 15 + self.pciInfoPosition
-        self.classCode = hex(BytesReader.read_int8(self.rom, self.pos1_classCode)) + ' - ' \
-                         + hex(BytesReader.read_int8(self.rom, self.pos2_classCode)) + ' - ' \
-                         + hex(BytesReader.read_int8(self.rom, self.pos3_classCode))
-        print('classCode :', self.classCode)
-
-        self.pos_imageLength = 16 + self.pciInfoPosition
-        self.imageLength = hex(BytesReader.read_int16(self.rom, self.pos_imageLength))
-        print('imageLength :', self.imageLength)
-
-        self.pos_revisionLevel = 18 + self.pciInfoPosition
-        self.revisionLevel = hex(BytesReader.read_int16(self.rom, self.pos_revisionLevel))
-        print('revisionLevel :', self.revisionLevel)
-
-        self.pos_codeType = 20 + self.pciInfoPosition
-        self.codeType = hex(BytesReader.read_int8(self.rom, self.pos_codeType))
-        print('codeType :', self.codeType)
-
-        self.pos_indicator = 21 + self.pciInfoPosition
-        self.indicator = hex(BytesReader.read_int8(self.rom, self.pos_indicator))
-        print('indicator :', self.indicator)
-
-        self.pos_reserved = 22 + self.pciInfoPosition
-        self.reserved = hex(BytesReader.read_int16(self.rom, self.pos_reserved))
-        print('reserved :', self.reserved)
-
-        if self.devIDstr in supportedDevIDs:
-            print('>> Ok this rom device is supported')
-        else:
-            print('>> Nok this rom device is not supported, exiting')
-            exit(-1)
 
         self.powerTableSize = BytesReader.read_int16(self.rom, self.powerTablePosition)
         print('powerTableSize :', self.powerTableSize)
@@ -182,150 +139,444 @@ class HawaiiBios:
         self.tdcLimitOffset = self.tdpLimitOffset + 2
         print('tdcLimitOffset :', hex(self.tdcLimitOffset))
 
-        self.pos_SSVID = self.pciInfoPosition - 12
-        self.SSVID = hex(BytesReader.read_int16(self.rom, self.pos_SSVID))[2:]
-        print('SSVID :', self.SSVID)
-
-        self.pos_SSDID = self.pciInfoPosition - 14
-        self.SSVID = hex(BytesReader.read_int16(self.rom, self.pos_SSDID))[2:]
-        print('SSVID :', self.SSVID)
-
         self.pos_CCCLimitsPosition = 44 + self.powerTablePosition
         self.CCCLimitsPosition = self.powerTablePosition + BytesReader.read_int16(self.rom, self.pos_CCCLimitsPosition)
         print('CCCLimitsPosition :', hex(self.CCCLimitsPosition))
 
+        # Overview
+
+        self.pos_biosName = 220
+        self.data['Overview'].append({
+            'name': 'bios name',
+            'value': BytesReader.read_str(self.rom, self.pos_biosName, 32),
+            'unit': '',
+            'position': str(hex(self.pos_biosName))
+        })
+
+        self.pos_devIDstr = 6 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'dev id',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_devIDstr))),
+            'unit': '' ,
+            'position': str(hex(self.pos_devIDstr))
+        })
+
+        if self.data['Overview'][-1]['value'] in supportedDevIDs:
+            print('>> Ok this rom device is supported')
+        else:
+            print('>> Warning this rom device seems not supported')
+
+        self.pos_vendorID = 4 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'vendor id',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_vendorID))),
+            'unit': '',
+            'position': str(hex(self.pos_vendorID))
+        })
+
+        self.pos_productData = 8 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'product data',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_productData))),
+            'unit': '',
+            'position': str(hex(self.pos_productData))
+        })
+
+        self.pos_structureLength = 10 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'structure length',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_structureLength))),
+            'unit': '',
+            'position': str(hex(self.pos_structureLength))
+        })
+
+        self.pos_structureRevision = 12 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'structure revision',
+            'value': str(hex(BytesReader.read_int8(self.rom, self.pos_structureRevision))),
+            'unit': '',
+            'position': str(hex(self.pos_structureRevision))
+        })
+
+        self.pos1_classCode = 13 + self.pciInfoPosition
+        self.pos2_classCode = 14 + self.pciInfoPosition
+        self.pos3_classCode = 15 + self.pciInfoPosition
+        class_code = hex(BytesReader.read_int8(self.rom, self.pos1_classCode)) \
+                     + ' - ' \
+                     + hex(BytesReader.read_int8(self.rom, self.pos2_classCode)) \
+                     + ' - ' \
+                     + hex(BytesReader.read_int8(self.rom, self.pos3_classCode))
+        self.data['Overview'].append({
+            'name': 'structure revision',
+            'value': class_code,
+            'unit': '',
+            'position': class_code
+        })
+
+        self.pos_imageLength = 16 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'image length',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_imageLength))),
+            'unit': '',
+            'position': str(hex(self.pos_imageLength))
+        })
+
+        self.pos_revisionLevel = 18 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'revision level',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_revisionLevel))),
+            'unit': '',
+            'position': str(hex(self.pos_revisionLevel))
+        })
+
+        self.pos_codeType = 20 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'code type',
+            'value': str(hex(BytesReader.read_int8(self.rom, self.pos_codeType))),
+            'unit': '',
+            'position': str(hex(self.pos_codeType))
+        })
+
+        self.pos_indicator = 21 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'indicator',
+            'value': str(hex(BytesReader.read_int8(self.rom, self.pos_indicator))),
+            'unit': '',
+            'position': str(hex(self.pos_indicator))
+        })
+
+        self.pos_reserved = 22 + self.pciInfoPosition
+        self.data['Overview'].append({
+            'name': 'reserved',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_reserved))),
+            'unit': '',
+            'position': str(hex(self.pos_reserved))
+        })
+
+        self.pos_SSVID = self.pciInfoPosition - 12
+        self.data['Overview'].append({
+            'name': 'SSVID',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_SSVID))[2:]),
+            'unit': '',
+            'position': str(hex(self.pos_SSVID))
+        })
+
+        self.pos_SSDID = self.pciInfoPosition - 14
+        self.data['Overview'].append({
+            'name': 'SSDID',
+            'value': str(hex(BytesReader.read_int16(self.rom, self.pos_SSDID))[2:]),
+            'unit': '',
+            'position': str(hex(self.pos_SSDID))
+        })
+
+
         self.pos_gpuMaxClock = self.CCCLimitsPosition + 2
-        self.gpuMaxClock = BytesReader.read_int24(self.rom, self.pos_gpuMaxClock)
-        print('gpuMaxClock :', self.gpuMaxClock / 100, 'MHz')
+        self.data['Overview'].append({
+            'name': 'gpu max clock',
+            'value': str(BytesReader.read_int24(self.rom, self.pos_gpuMaxClock)),
+            'unit': '10 KHz',
+            'position': str(hex(self.pos_gpuMaxClock))
+        })
 
         self.pos_memMaxClock = self.CCCLimitsPosition + 6
-        self.memMaxClock = BytesReader.read_int24(self.rom, self.pos_memMaxClock)
-        print('memMaxClock :', self.memMaxClock / 100, 'MHz')
+        self.data['Overview'].append({
+            'name': 'mem max clock',
+            'value': str(BytesReader.read_int24(self.rom, self.pos_memMaxClock)),
+            'unit': '10 KHz',
+            'position': str(hex(self.pos_memMaxClock))
+        })
+
+        # Powerplay
 
         temp_pos = self.powerTablePosition + self.clockInfoOffset
-        self.gpumemFrequencyListAndPowerLimit = {
-            hex(temp_pos + 2):
-                str(BytesReader.read_int24(self.rom, temp_pos + 2) / 100) + ' MHz',
-            hex(temp_pos + 11):
-                str(BytesReader.read_int24(self.rom, temp_pos + 11) / 100) + ' MHz',
-            hex(temp_pos + 20):
-                str(BytesReader.read_int24(self.rom, temp_pos + 20) / 100) + ' MHz',
-            hex(temp_pos + 5):
-                str(BytesReader.read_int24(self.rom, temp_pos + 5) / 100) + ' MHz',
-            hex(temp_pos + 14):
-                str(BytesReader.read_int24(self.rom, temp_pos + 14) / 100) + ' MHz',
-            hex(temp_pos + 23):
-                str(BytesReader.read_int24(self.rom, temp_pos + 23) / 100) + ' MHz',
 
-            hex(self.powerTablePosition + self.tdpLimitOffset):
-                str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.tdpLimitOffset)) + ' W',
-            hex(self.powerTablePosition + self.powerDeliveryLimitOffset):
-                str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset)) + ' W',
+        self.data['Powerplay'].append({
+            'name': 'GPU clock 1',
+            'value': str(BytesReader.read_int24(self.rom, temp_pos + 2)),
+            'unit': '10 KHz',
+            'position': str(hex(temp_pos + 2))
+        })
+        self.data['Powerplay'].append({
+            'name': 'GPU clock 2',
+            'value': str(BytesReader.read_int24(self.rom, temp_pos + 11)),
+            'unit': '10 KHz',
+            'position': str(hex(temp_pos + 11))
+        })
+        self.data['Powerplay'].append({
+            'name': 'GPU clock 3',
+            'value': str(BytesReader.read_int24(self.rom, temp_pos + 20)),
+            'unit': '10 KHz',
+            'position': str(hex(temp_pos + 20))
+        })
+        self.data['Powerplay'].append({
+            'name': 'Mem clock 1',
+            'value': str(BytesReader.read_int24(self.rom, temp_pos + 5)),
+            'unit': '10 KHz',
+            'position': str(hex(temp_pos + 5))
+        })
+        self.data['Powerplay'].append({
+            'name': 'Mem clock 2',
+            'value': str(BytesReader.read_int24(self.rom, temp_pos + 14)),
+            'unit': '10 KHz',
+            'position': str(hex(temp_pos + 14))
+        })
+        self.data['Powerplay'].append({
+            'name': 'Mem clock 3',
+            'value': str(BytesReader.read_int24(self.rom, temp_pos + 23)),
+            'unit': '10 KHz',
+            'position': str(hex(temp_pos + 23))
+        })
+        self.data['Powerplay'].append({
+            'name': 'TDP max',
+            'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.tdpLimitOffset)),
+            'unit': 'W',
+            'position': str(hex(self.powerTablePosition + self.tdpLimitOffset))
+        })
+        self.data['Powerplay'].append({
+            'name': 'Power limit',
+            'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset)),
+            'unit': 'W',
+            'position': str(hex(self.powerTablePosition + self.powerDeliveryLimitOffset))
+        })
+        self.data['Powerplay'].append({
+            'name': 'TDC limit',
+            'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.tdcLimitOffset)),
+            'unit': 'A',
+            'position': str(hex(self.powerTablePosition + self.tdcLimitOffset))
+        })
+        self.data['Powerplay'].append({
+            'name': 'Max ASIC temp',
+            'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset + 2)),
+            'unit': '°C',
+            'position': str(hex(self.powerTablePosition + self.powerDeliveryLimitOffset + 2))
+        })
 
-            hex(self.powerTablePosition + self.tdcLimitOffset):
-                str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.tdcLimitOffset)) + ' A',
-
-            hex(self.powerTablePosition + self.powerDeliveryLimitOffset + 2):
-                str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset + 2)) + ' °C',
-        }
-        pprint(self.gpumemFrequencyListAndPowerLimit)
+        # VDDCI states
 
         self.pos_vddciTableCount = self.powerTablePosition + self.AUXvoltageOffset
         self.vddciTableCount = BytesReader.read_int8(self.rom, self.pos_vddciTableCount)
-        print('vddciTableCount :', self.vddciTableCount)
+        self.data['VDDCI states'].append({
+            'name': 'VDDCI table count',
+            'value': str(BytesReader.read_int8(self.rom, self.pos_vddciTableCount)),
+            'unit': '',
+            'position': str(hex(self.pos_vddciTableCount))
+        })
 
-        self.VDDCITable = []
         for vddcicounter in range(self.vddciTableCount):
             pos_vddci = self.powerTablePosition + self.AUXvoltageOffset + 1 + (vddcicounter * 5)
-            self.VDDCITable.append(str(BytesReader.read_int24(self.rom, pos_vddci) / 100) + ' MHz')
-        print('VDDCITable :')
-        pprint(self.VDDCITable)
+            self.data['VDDCI states'].append({
+                'name': 'DPM ' + str(vddcicounter),
+                'value': str(BytesReader.read_int24(self.rom, pos_vddci)),
+                'unit': '10 KHz',
+                'position': str(hex(pos_vddci))
+            })
+
+        # MEM freq table
 
         self.pos_memoryFrequencyTableCount = self.powerTablePosition + self.memoryFrequencyTableOffset
         self.memoryFrequencyTableCount = BytesReader.read_int8(self.rom, self.pos_memoryFrequencyTableCount)
-        print('gpuFrequencyTableCount :', self.memoryFrequencyTableCount)
+        self.data['MEM freq table'].append({
+            'name': 'MEM freq table count',
+            'value': str(self.memoryFrequencyTableCount),
+            'unit': '',
+            'position': str(hex(self.pos_memoryFrequencyTableCount))
+        })
 
-        self.MEMFreqTable = []
-        for pos_mem_freq in range(self.memoryFrequencyTableCount):
-            pos_mem_freq = self.powerTablePosition + self.memoryFrequencyTableOffset + 1 + (pos_mem_freq * 5)
-            self.MEMFreqTable.append(str(BytesReader.read_int24(self.rom, pos_mem_freq) / 100) + ' MHz')
-        print('MEMFreqTable :')
-        pprint(self.MEMFreqTable)
+        for mem_freq_counter in range(self.memoryFrequencyTableCount):
+            pos_mem_freq = self.powerTablePosition + self.memoryFrequencyTableOffset + 1 + (mem_freq_counter * 5)
+            self.data['MEM freq table'].append({
+                'name': 'DPM ' + str(mem_freq_counter),
+                'value': str(BytesReader.read_int24(self.rom, pos_mem_freq)),
+                'unit': '10 KHz',
+                'position': str(hex(pos_mem_freq))
+            })
+
+        # GPU freq table
 
         self.pos_gpuFrequencyTableCount = self.powerTablePosition + self.gpuFrequencyTableOffset
         self.gpuFrequencyTableCount = BytesReader.read_int8(self.rom, self.pos_gpuFrequencyTableCount)
-        print('gpuFrequencyTableCount :', self.gpuFrequencyTableCount)
+        self.data['GPU freq table'].append({
+            'name': 'GPU freq table count',
+            'value': str(self.gpuFrequencyTableCount),
+            'unit': '',
+            'position': str(hex(self.pos_gpuFrequencyTableCount))
+        })
 
         self.GPUFreqTable = []
         for gpu_freq_counter in range(self.gpuFrequencyTableCount):
             pos_gpu_freq = self.powerTablePosition + self.gpuFrequencyTableOffset + 1 + (gpu_freq_counter * 5)
-            self.GPUFreqTable.append(str(BytesReader.read_int24(self.rom, pos_gpu_freq) / 100) + ' MHz')
-        print('GPUFreqTable :')
-        pprint(self.GPUFreqTable)
+            self.data['GPU freq table'].append({
+                'name': 'DPM ' + str(gpu_freq_counter),
+                'value': str(BytesReader.read_int24(self.rom, pos_gpu_freq)),
+                'unit': '10 KHz',
+                'position': str(hex(pos_gpu_freq))
+            })
+
+        # Start VCE limit tables
 
         self.pos_StartVCELimitTable = self.powerTablePosition + self.VCELimitTableOffset
         self.StartVCELimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartVCELimitTable)
-        self.StartVCELimitTable = {}
+        self.data['Start VCE limit table'].append({
+            'name': 'Start VCE limit table count',
+            'value': str(self.StartVCELimitTable_count),
+            'unit': '',
+            'position': str(hex(self.pos_StartVCELimitTable))
+        })
+
         for vce in range(self.StartVCELimitTable_count):
             pos_vce = self.powerTablePosition + self.VCELimitTableOffset + 1 + (vce * 3)
-            self.StartVCELimitTable[hex(pos_vce)] = str(BytesReader.read_int8(self.rom, pos_vce + 2)) + ' DPM, ' \
-                                                    + str(BytesReader.read_int16(self.rom, pos_vce)) + ' mV'
-        print('StartVCELimitTable :')
-        pprint(self.StartVCELimitTable)
+            self.data['Start VCE limit table'].append({
+                'name': 'DPM ' + str(BytesReader.read_int8(self.rom, pos_vce + 2)),
+                'value': str(BytesReader.read_int16(self.rom, pos_vce)),
+                'unit': 'mV',
+                'position': str(hex(pos_vce))
+            })
+
+        # Start UVD limit tables
 
         self.pos_StartUVDLimitTable = self.powerTablePosition + self.UVDLimitTableOffset
         self.StartUVDLimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartUVDLimitTable)
-        self.StartUVDLimitTable = {}
+        self.data['Start UVD limit table'].append({
+            'name': 'Start UVD limit table count',
+            'value': str(self.StartUVDLimitTable_count),
+            'unit': '',
+            'position': str(hex(self.pos_StartUVDLimitTable))
+        })
+
         for uvd in range(self.StartUVDLimitTable_count):
             pos_uvd = self.powerTablePosition + self.UVDLimitTableOffset + 1 + (uvd * 3)
-            self.StartUVDLimitTable[hex(pos_uvd)] = str(BytesReader.read_int8(self.rom, pos_uvd + 2)) + ' DPM, ' \
-                                                    + str(BytesReader.read_int16(self.rom, pos_uvd)) + ' mV'
-        print('StartUVDLimitTable :')
-        pprint(self.StartUVDLimitTable)
+            self.data['Start UVD limit table'].append({
+                'name': 'DPM ' + str(BytesReader.read_int8(self.rom, pos_uvd + 2)),
+                'value': str(BytesReader.read_int16(self.rom, pos_uvd)),
+                'unit': 'mV',
+                'position': str(hex(pos_uvd))
+            })
+
+        # Start SAMU limit tables
 
         self.pos_StartSAMULimitTable = self.powerTablePosition + self.SAMULimitTableOffset + 1
         self.StartSAMULimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartSAMULimitTable)
-        self.StartSAMULimitTable = {}
+        self.data['Start SAMU limit table'].append({
+            'name': 'Start SAMU limit table count',
+            'value': str(self.StartSAMULimitTable_count),
+            'unit': '',
+            'position': str(hex(self.pos_StartSAMULimitTable))
+        })
+
         for samu in range(self.StartSAMULimitTable_count):
             pos_samu = self.powerTablePosition + self.SAMULimitTableOffset + 2 + (samu * 5)
-            self.StartSAMULimitTable[hex(pos_samu)] = str(BytesReader.read_int24(self.rom, pos_samu + 2)) + ' DPM, ' \
-                                                      + str(BytesReader.read_int16(self.rom, pos_samu)) + ' mV'
-        print('StartSAMULimitTable :')
-        pprint(self.StartSAMULimitTable)
+            self.data['Start SAMU limit table'].append({
+                'name': 'DPM ' + str(BytesReader.read_int24(self.rom, pos_samu + 2)),
+                'value': str(BytesReader.read_int16(self.rom, pos_samu)),
+                'unit': 'mV',
+                'position': str(hex(pos_samu))
+            })
+
+        # Start ACP limit tables
 
         self.pos_StartACPLimitTable = self.powerTablePosition + self.ACPLimitTableOffset + 1
         self.StartACPLimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartACPLimitTable)
-        self.StartACPLimitTable = {}
+        self.data['Start ACP limit table'].append({
+            'name': 'Start ACP limit table count',
+            'value': str(self.StartACPLimitTable_count),
+            'unit': '',
+            'position': str(hex(self.pos_StartACPLimitTable))
+        })
+
         for acp in range(self.StartACPLimitTable_count):
             pos_acp = self.powerTablePosition + self.ACPLimitTableOffset + 2 + (acp * 5)
-            self.StartACPLimitTable[hex(pos_acp)] = str(BytesReader.read_int24(self.rom, pos_acp + 2)) + ' DPM, ' \
-                                                    + str(BytesReader.read_int16(self.rom, pos_acp)) + ' mV'
-        print('StartACPLimitTable :')
-        pprint(self.StartACPLimitTable)
+            self.data['Start ACP limit table'].append({
+                'name': 'DPM ' + str(BytesReader.read_int24(self.rom, pos_acp + 2)),
+                'value': str(BytesReader.read_int16(self.rom, pos_acp)),
+                'unit': 'mV',
+                'position': str(hex(pos_samu))
+            })
 
-        self.fanList = {
-            hex(self.fanTablePosition + 1): str(BytesReader.read_int8(self.rom, self.fanTablePosition + 1)) + ' °C',
-            hex(self.fanTablePosition + 2): str(BytesReader.read_int16(self.rom, self.fanTablePosition + 2) / 100) + ' °C',
-            hex(self.fanTablePosition + 4): str(BytesReader.read_int16(self.rom, self.fanTablePosition + 4) / 100) + ' °C',
-            hex(self.fanTablePosition + 6): str(BytesReader.read_int16(self.rom, self.fanTablePosition + 6) / 100) + ' °C',
-            hex(self.fanTablePosition + 8): str(BytesReader.read_int16(self.rom, self.fanTablePosition + 8) / 100) + ' %',
-            hex(self.fanTablePosition + 10): str(BytesReader.read_int16(self.rom, self.fanTablePosition + 10) / 100) + ' %',
-            hex(self.fanTablePosition + 12): str(BytesReader.read_int16(self.rom, self.fanTablePosition + 12) / 100) + ' %',
-            hex(self.fanTablePosition + 14): str(BytesReader.read_int16(self.rom, self.fanTablePosition + 14) / 100) + ' °C',
-            hex(self.fanTablePosition + 16): str(BytesReader.read_int8(self.rom, self.fanTablePosition + 16)) + ' °C',
-            hex(self.fanTablePosition + 17): str(BytesReader.read_int8(self.rom, self.fanTablePosition + 17)) + ' %',
-        }
-        print('fanList :')
-        pprint(self.fanList)
+        # Fan Profile
+
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 1)),
+            'unit': '°C',
+            'position': str(hex(self.fanTablePosition + 1))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 2)),
+            'unit': '/ 100 - °C',
+            'position': str(hex(self.fanTablePosition + 2))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 4)),
+            'unit': '/ 100 - °C',
+            'position': str(hex(self.fanTablePosition + 4))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 6)),
+            'unit': '/ 100 - °C',
+            'position': str(hex(self.fanTablePosition + 6))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 8)),
+            'unit': '/ 100 - %',
+            'position': str(hex(self.fanTablePosition + 8))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 10)),
+            'unit': '/ 100 - %',
+            'position': str(hex(self.fanTablePosition + 10))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 12)),
+            'unit': '/ 100 - %',
+            'position': str(hex(self.fanTablePosition + 12))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 14)),
+            'unit': '/ 100 - °C',
+            'position': str(hex(self.fanTablePosition + 14))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 16)),
+            'unit': '°C',
+            'position': str(hex(self.fanTablePosition + 16))
+        })
+        self.data['Fan Profile'].append({
+            'name': 'DPM',
+            'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 17)),
+            'unit': '%',
+            'position': str(hex(self.fanTablePosition + 17))
+        })
+
+        # VRM settings
 
         self.pos_vrmList_size = self.gpuVRMTablePosition + 6
         self.vrmList_size = BytesReader.read_int16(self.rom, self.pos_vrmList_size)
-        self.vrmList = {}
+        self.data['VRM settings'].append({
+            'name': 'VRM table count',
+            'value': str(self.vrmList_size),
+            'unit': '',
+            'position': str(hex(self.pos_vrmList_size))
+        })
+
         for vrm in range(2, self.vrmList_size, 2):
             pos_temp = self.gpuVRMTablePosition + 6 + vrm
             temp = BytesReader.read_int16(self.rom, pos_temp)
             if hex(temp) in vrm_types:
                 value = BytesReader.read_int16(self.rom, self.gpuVRMTablePosition + 8 + vrm)
-                self.vrmList[vrm_types[hex(temp)] + ' @' + hex(pos_temp)] = value
-        print('vrmList :')
-        pprint(self.vrmList)
+                self.data['VRM settings'].append({
+                    'name': vrm_types[hex(temp)],
+                    'value': str(value),
+                    'unit': '',
+                    'position': str(hex(pos_temp))
+                })
+            else:
+                print('unknow VRM :', hex(temp), '@', hex(pos_temp))
+
