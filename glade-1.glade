@@ -8,6 +8,10 @@
       <column type="gchararray"/>
       <!-- column-name value -->
       <column type="gchararray"/>
+      <!-- column-name unit -->
+      <column type="gchararray"/>
+      <!-- column-name position -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkListStore" id="section_list_store">
@@ -164,10 +168,9 @@
                         </child>
                         <child>
                           <object class="GtkTreeViewColumn" id="column_name">
+                            <property name="resizable">True</property>
                             <property name="sizing">fixed</property>
                             <property name="title" translatable="yes">name</property>
-                            <property name="reorderable">True</property>
-                            <property name="sort_indicator">True</property>
                             <child>
                               <object class="GtkCellRendererText" id="cellrenderertext1"/>
                               <attributes>
@@ -178,10 +181,9 @@
                         </child>
                         <child>
                           <object class="GtkTreeViewColumn" id="column_value">
+                            <property name="resizable">True</property>
                             <property name="sizing">fixed</property>
                             <property name="title" translatable="yes">value</property>
-                            <property name="reorderable">True</property>
-                            <property name="sort_indicator">True</property>
                             <child>
                               <object class="GtkCellRendererText" id="cellrenderertext2">
                                 <property name="editable">True</property>
@@ -189,6 +191,32 @@
                               </object>
                               <attributes>
                                 <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="column_unit">
+                            <property name="resizable">True</property>
+                            <property name="sizing">fixed</property>
+                            <property name="title" translatable="yes">unit</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="cellrenderertext4"/>
+                              <attributes>
+                                <attribute name="text">2</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="column_position">
+                            <property name="resizable">True</property>
+                            <property name="sizing">fixed</property>
+                            <property name="title" translatable="yes">position</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="cellrenderertext5"/>
+                              <attributes>
+                                <attribute name="text">3</attribute>
                               </attributes>
                             </child>
                           </object>
@@ -280,6 +308,7 @@
     <property name="website">https://github.com/emeric254/PyHawaiiBiosReader</property>
     <property name="logo_icon_name">edit-find-replace</property>
     <property name="license_type">mit-x11</property>
+    <signal name="close" handler="onAboutDestroy" swapped="no"/>
     <signal name="delete-event" handler="onAboutDestroy" swapped="no"/>
     <signal name="response" handler="onAboutDestroy" swapped="no"/>
     <child internal-child="vbox">
