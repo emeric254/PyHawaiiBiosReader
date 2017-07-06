@@ -3,24 +3,31 @@
 # -*- coding: utf-8 -*-
 
 import sys
-#~ from tools import RomReader, HawaiiBios
+from tools import RomReader
+from tools.HawaiiBios import HawaiiBios
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-
-rom_bytes = None
-#~ rom_bytes = RomReader.read_rom('290X_NOMOD_STOCK_V1.8.rom')
+bios = None
 
 
 def load_rom(file_name):
-    global rom_bytes
-    rom_bytes = RomReader.read_rom(file_name)
+    global bios
+    bios = HawaiiBios(RomReader.read_rom(file_name))
 
 
-def load_list():
-    pass
+def load_sections():
+    section_list_store.clear()
+    for key in sorted(bios.data.keys()):
+        section_list_store.append([key])
+
+
+def load_fields(section):
+    field_list_store.clear()
+    for row in bios.data[section]:
+        field_list_store.append([row['name'], row['value'], row['unit'], row['position']])
 
 
 class Handler:
@@ -44,7 +51,7 @@ class Handler:
 
     @staticmethod
     def onSectionChoice(cell, data=None):
-        print(section_list_store[cell.get_active()][0])
+        load_fields(section_list_store[cell.get_active()][0])
 
     @staticmethod
     def onOpenFile(*args):
@@ -53,8 +60,8 @@ class Handler:
         if response == Gtk.ResponseType.OK:
             file_name = dialog.get_filename()
             print('File selected:', file_name)
-            field_list_store.append(['file', file_name])
-            section_list_store.append([file_name])
+            load_rom(file_name)
+            load_sections()
         dialog.destroy()
 
     @staticmethod
