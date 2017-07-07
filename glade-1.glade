@@ -12,6 +12,8 @@
       <column type="gchararray"/>
       <!-- column-name position -->
       <column type="gchararray"/>
+      <!-- column-name length -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkListStore" id="section_list_store">
@@ -23,8 +25,7 @@
   <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">PyHawaiiBiosEditor</property>
-    <property name="default_width">480</property>
-    <property name="default_height">640</property>
+    <property name="default_height">480</property>
     <property name="destroy_with_parent">True</property>
     <property name="has_resize_grip">True</property>
     <property name="show_menubar">False</property>
@@ -159,6 +160,8 @@
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
                         <property name="model">field_list_store</property>
+                        <property name="headers_clickable">False</property>
+                        <property name="rules_hint">True</property>
                         <property name="search_column">0</property>
                         <property name="fixed_height_mode">True</property>
                         <property name="enable_grid_lines">both</property>
@@ -170,6 +173,7 @@
                           <object class="GtkTreeViewColumn" id="column_name">
                             <property name="resizable">True</property>
                             <property name="sizing">fixed</property>
+                            <property name="min_width">128</property>
                             <property name="title" translatable="yes">name</property>
                             <child>
                               <object class="GtkCellRendererText" id="cellrenderertext1"/>
@@ -183,6 +187,7 @@
                           <object class="GtkTreeViewColumn" id="column_value">
                             <property name="resizable">True</property>
                             <property name="sizing">fixed</property>
+                            <property name="min_width">172</property>
                             <property name="title" translatable="yes">value</property>
                             <child>
                               <object class="GtkCellRendererText" id="cellrenderertext2">
@@ -199,6 +204,7 @@
                           <object class="GtkTreeViewColumn" id="column_unit">
                             <property name="resizable">True</property>
                             <property name="sizing">fixed</property>
+                            <property name="min_width">96</property>
                             <property name="title" translatable="yes">unit</property>
                             <child>
                               <object class="GtkCellRendererText" id="cellrenderertext4"/>
@@ -212,11 +218,25 @@
                           <object class="GtkTreeViewColumn" id="column_position">
                             <property name="resizable">True</property>
                             <property name="sizing">fixed</property>
+                            <property name="min_width">96</property>
                             <property name="title" translatable="yes">position</property>
                             <child>
                               <object class="GtkCellRendererText" id="cellrenderertext5"/>
                               <attributes>
                                 <attribute name="text">3</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="column_length">
+                            <property name="sizing">fixed</property>
+                            <property name="min_width">64</property>
+                            <property name="title" translatable="yes">length</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="cellrenderertext6"/>
+                              <attributes>
+                                <attribute name="text">4</attribute>
                               </attributes>
                             </child>
                           </object>
