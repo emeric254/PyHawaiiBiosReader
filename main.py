@@ -27,7 +27,7 @@ def load_sections():
 def load_fields(section):
     field_list_store.clear()
     for row in bios.data[section]:
-        field_list_store.append([row['name'], row['value'], row['unit'], row['position']])
+        field_list_store.append([row['name'], row['value'], row['unit'], row['position'], row['length']])
 
 
 class Handler:
@@ -51,7 +51,8 @@ class Handler:
 
     @staticmethod
     def onSectionChoice(cell, data=None):
-        load_fields(section_list_store[cell.get_active()][0])
+        if cell.get_active() in range(len(section_list_store)):
+            load_fields(section_list_store[cell.get_active()][0])
 
     @staticmethod
     def onOpenFile(*args):
@@ -60,7 +61,12 @@ class Handler:
         if response == Gtk.ResponseType.OK:
             file_name = dialog.get_filename()
             print('File selected:', file_name)
+            #
             load_rom(file_name)
+            #
+            section_list_store.clear()
+            field_list_store.clear()
+            #
             load_sections()
         dialog.destroy()
 
