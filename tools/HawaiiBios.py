@@ -150,7 +150,8 @@ class HawaiiBios:
             'name': 'bios name',
             'value': BytesReader.read_str(self.rom, self.pos_biosName, 32),
             'unit': '',
-            'position': str(hex(self.pos_biosName))
+            'position': str(hex(self.pos_biosName)),
+            'length' : '32 char'
         })
 
         self.pos_devIDstr = 6 + self.pciInfoPosition
@@ -158,7 +159,8 @@ class HawaiiBios:
             'name': 'dev id',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_devIDstr))),
             'unit': '' ,
-            'position': str(hex(self.pos_devIDstr))
+            'position': str(hex(self.pos_devIDstr)),
+            'length' : '16 bits'
         })
 
         if self.data['Overview'][-1]['value'] in supportedDevIDs:
@@ -171,7 +173,8 @@ class HawaiiBios:
             'name': 'vendor id',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_vendorID))),
             'unit': '',
-            'position': str(hex(self.pos_vendorID))
+            'position': str(hex(self.pos_vendorID)),
+            'length' : '16 bits'
         })
 
         self.pos_productData = 8 + self.pciInfoPosition
@@ -179,7 +182,8 @@ class HawaiiBios:
             'name': 'product data',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_productData))),
             'unit': '',
-            'position': str(hex(self.pos_productData))
+            'position': str(hex(self.pos_productData)),
+            'length' : '16 bits'
         })
 
         self.pos_structureLength = 10 + self.pciInfoPosition
@@ -187,7 +191,8 @@ class HawaiiBios:
             'name': 'structure length',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_structureLength))),
             'unit': '',
-            'position': str(hex(self.pos_structureLength))
+            'position': str(hex(self.pos_structureLength)),
+            'length' : '16 bits'
         })
 
         self.pos_structureRevision = 12 + self.pciInfoPosition
@@ -195,7 +200,8 @@ class HawaiiBios:
             'name': 'structure revision',
             'value': str(hex(BytesReader.read_int8(self.rom, self.pos_structureRevision))),
             'unit': '',
-            'position': str(hex(self.pos_structureRevision))
+            'position': str(hex(self.pos_structureRevision)),
+            'length' : '8 bits'
         })
 
         self.pos1_classCode = 13 + self.pciInfoPosition
@@ -210,7 +216,8 @@ class HawaiiBios:
             'name': 'structure revision',
             'value': class_code,
             'unit': '',
-            'position': class_code
+            'position': class_code,
+            'length' : ''
         })
 
         self.pos_imageLength = 16 + self.pciInfoPosition
@@ -218,7 +225,8 @@ class HawaiiBios:
             'name': 'image length',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_imageLength))),
             'unit': '',
-            'position': str(hex(self.pos_imageLength))
+            'position': str(hex(self.pos_imageLength)),
+            'length' : '16 bits'
         })
 
         self.pos_revisionLevel = 18 + self.pciInfoPosition
@@ -226,7 +234,8 @@ class HawaiiBios:
             'name': 'revision level',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_revisionLevel))),
             'unit': '',
-            'position': str(hex(self.pos_revisionLevel))
+            'position': str(hex(self.pos_revisionLevel)),
+            'length' : '16bits'
         })
 
         self.pos_codeType = 20 + self.pciInfoPosition
@@ -234,7 +243,8 @@ class HawaiiBios:
             'name': 'code type',
             'value': str(hex(BytesReader.read_int8(self.rom, self.pos_codeType))),
             'unit': '',
-            'position': str(hex(self.pos_codeType))
+            'position': str(hex(self.pos_codeType)),
+            'length' : '8 bits'
         })
 
         self.pos_indicator = 21 + self.pciInfoPosition
@@ -242,7 +252,8 @@ class HawaiiBios:
             'name': 'indicator',
             'value': str(hex(BytesReader.read_int8(self.rom, self.pos_indicator))),
             'unit': '',
-            'position': str(hex(self.pos_indicator))
+            'position': str(hex(self.pos_indicator)),
+            'length' : '8 bits'
         })
 
         self.pos_reserved = 22 + self.pciInfoPosition
@@ -250,7 +261,8 @@ class HawaiiBios:
             'name': 'reserved',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_reserved))),
             'unit': '',
-            'position': str(hex(self.pos_reserved))
+            'position': str(hex(self.pos_reserved)),
+            'length' : '16 bits'
         })
 
         self.pos_SSVID = self.pciInfoPosition - 12
@@ -258,7 +270,8 @@ class HawaiiBios:
             'name': 'SSVID',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_SSVID))[2:]),
             'unit': '',
-            'position': str(hex(self.pos_SSVID))
+            'position': str(hex(self.pos_SSVID)),
+            'length' : '16 bits'
         })
 
         self.pos_SSDID = self.pciInfoPosition - 14
@@ -266,7 +279,8 @@ class HawaiiBios:
             'name': 'SSDID',
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_SSDID))[2:]),
             'unit': '',
-            'position': str(hex(self.pos_SSDID))
+            'position': str(hex(self.pos_SSDID)),
+            'length' : '16 bits'
         })
 
 
@@ -275,7 +289,8 @@ class HawaiiBios:
             'name': 'gpu max clock',
             'value': str(BytesReader.read_int24(self.rom, self.pos_gpuMaxClock)),
             'unit': '10 KHz',
-            'position': str(hex(self.pos_gpuMaxClock))
+            'position': str(hex(self.pos_gpuMaxClock)),
+            'length' : '24 bits'
         })
 
         self.pos_memMaxClock = self.CCCLimitsPosition + 6
@@ -283,7 +298,8 @@ class HawaiiBios:
             'name': 'mem max clock',
             'value': str(BytesReader.read_int24(self.rom, self.pos_memMaxClock)),
             'unit': '10 KHz',
-            'position': str(hex(self.pos_memMaxClock))
+            'position': str(hex(self.pos_memMaxClock)),
+            'length' : '24 bits'
         })
 
         # Powerplay
@@ -294,61 +310,71 @@ class HawaiiBios:
             'name': 'GPU clock 1',
             'value': str(BytesReader.read_int24(self.rom, temp_pos + 2)),
             'unit': '10 KHz',
-            'position': str(hex(temp_pos + 2))
+            'position': str(hex(temp_pos + 2)),
+            'length' : '24 bits'
         })
         self.data['Powerplay'].append({
             'name': 'GPU clock 2',
             'value': str(BytesReader.read_int24(self.rom, temp_pos + 11)),
             'unit': '10 KHz',
-            'position': str(hex(temp_pos + 11))
+            'position': str(hex(temp_pos + 11)),
+            'length' : '24 bits'
         })
         self.data['Powerplay'].append({
             'name': 'GPU clock 3',
             'value': str(BytesReader.read_int24(self.rom, temp_pos + 20)),
             'unit': '10 KHz',
-            'position': str(hex(temp_pos + 20))
+            'position': str(hex(temp_pos + 20)),
+            'length' : '24 bits'
         })
         self.data['Powerplay'].append({
             'name': 'Mem clock 1',
             'value': str(BytesReader.read_int24(self.rom, temp_pos + 5)),
             'unit': '10 KHz',
-            'position': str(hex(temp_pos + 5))
+            'position': str(hex(temp_pos + 5)),
+            'length' : '24 bits'
         })
         self.data['Powerplay'].append({
             'name': 'Mem clock 2',
             'value': str(BytesReader.read_int24(self.rom, temp_pos + 14)),
             'unit': '10 KHz',
-            'position': str(hex(temp_pos + 14))
+            'position': str(hex(temp_pos + 14)),
+            'length' : '24 bits'
         })
         self.data['Powerplay'].append({
             'name': 'Mem clock 3',
             'value': str(BytesReader.read_int24(self.rom, temp_pos + 23)),
             'unit': '10 KHz',
-            'position': str(hex(temp_pos + 23))
+            'position': str(hex(temp_pos + 23)),
+            'length' : '24 bits'
         })
         self.data['Powerplay'].append({
             'name': 'TDP max',
             'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.tdpLimitOffset)),
             'unit': 'W',
-            'position': str(hex(self.powerTablePosition + self.tdpLimitOffset))
+            'position': str(hex(self.powerTablePosition + self.tdpLimitOffset)),
+            'length' : '16 bits'
         })
         self.data['Powerplay'].append({
             'name': 'Power limit',
             'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset)),
             'unit': 'W',
-            'position': str(hex(self.powerTablePosition + self.powerDeliveryLimitOffset))
+            'position': str(hex(self.powerTablePosition + self.powerDeliveryLimitOffset)),
+            'length' : '16 bits'
         })
         self.data['Powerplay'].append({
             'name': 'TDC limit',
             'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.tdcLimitOffset)),
             'unit': 'A',
-            'position': str(hex(self.powerTablePosition + self.tdcLimitOffset))
+            'position': str(hex(self.powerTablePosition + self.tdcLimitOffset)),
+            'length' : '16 bits'
         })
         self.data['Powerplay'].append({
             'name': 'Max ASIC temp',
             'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset + 2)),
             'unit': '°C',
-            'position': str(hex(self.powerTablePosition + self.powerDeliveryLimitOffset + 2))
+            'position': str(hex(self.powerTablePosition + self.powerDeliveryLimitOffset + 2)),
+            'length' : '16 bits'
         })
 
         # VDDCI states
@@ -359,16 +385,26 @@ class HawaiiBios:
             'name': 'VDDCI table count',
             'value': str(BytesReader.read_int8(self.rom, self.pos_vddciTableCount)),
             'unit': '',
-            'position': str(hex(self.pos_vddciTableCount))
+            'position': str(hex(self.pos_vddciTableCount)),
+            'length' : '8 bits'
         })
 
         for vddcicounter in range(self.vddciTableCount):
-            pos_vddci = self.powerTablePosition + self.AUXvoltageOffset + 1 + (vddcicounter * 5)
+            pos_vddci_freq = self.powerTablePosition + self.AUXvoltageOffset + 1 + (vddcicounter * 5)
+            pos_vddci_volt = pos_vddci_freq + 3
             self.data['VDDCI states'].append({
-                'name': 'DPM ' + str(vddcicounter),
-                'value': str(BytesReader.read_int24(self.rom, pos_vddci)),
+                'name': 'DPM ' + str(vddcicounter) + ' : frequency',
+                'value': str(BytesReader.read_int24(self.rom, pos_vddci_freq)),
                 'unit': '10 KHz',
-                'position': str(hex(pos_vddci))
+                'position': str(hex(pos_vddci_freq)),
+                'length' : '24 bits'
+            })
+            self.data['VDDCI states'].append({
+                'name': 'DPM ' + str(vddcicounter) + ' : voltage',
+                'value': str(BytesReader.read_int16(self.rom, pos_vddci_volt)),
+                'unit': 'mV',
+                'position': str(hex(pos_vddci_volt)),
+                'length' : '16 bits'
             })
 
         # MEM freq table
@@ -379,16 +415,26 @@ class HawaiiBios:
             'name': 'MEM freq table count',
             'value': str(self.memoryFrequencyTableCount),
             'unit': '',
-            'position': str(hex(self.pos_memoryFrequencyTableCount))
+            'position': str(hex(self.pos_memoryFrequencyTableCount)),
+            'length' : '8 bits'
         })
 
         for mem_freq_counter in range(self.memoryFrequencyTableCount):
             pos_mem_freq = self.powerTablePosition + self.memoryFrequencyTableOffset + 1 + (mem_freq_counter * 5)
+            pos_mem_volt = pos_mem_freq + 3
             self.data['MEM freq table'].append({
-                'name': 'DPM ' + str(mem_freq_counter),
+                'name': 'DPM ' + str(mem_freq_counter) + ' : frequency',
                 'value': str(BytesReader.read_int24(self.rom, pos_mem_freq)),
                 'unit': '10 KHz',
-                'position': str(hex(pos_mem_freq))
+                'position': str(hex(pos_mem_freq)),
+                'length' : '24 bits'
+            })
+            self.data['MEM freq table'].append({
+                'name': 'DPM ' + str(mem_freq_counter) + ' : voltage',
+                'value': str(BytesReader.read_int16(self.rom, pos_mem_volt)),
+                'unit': '10 KHz',
+                'position': str(hex(pos_mem_volt)),
+                'length' : '16 bits'
             })
 
         # GPU freq table
@@ -399,17 +445,27 @@ class HawaiiBios:
             'name': 'GPU freq table count',
             'value': str(self.gpuFrequencyTableCount),
             'unit': '',
-            'position': str(hex(self.pos_gpuFrequencyTableCount))
+            'position': str(hex(self.pos_gpuFrequencyTableCount)),
+            'length' : '8 bits'
         })
 
         self.GPUFreqTable = []
         for gpu_freq_counter in range(self.gpuFrequencyTableCount):
             pos_gpu_freq = self.powerTablePosition + self.gpuFrequencyTableOffset + 1 + (gpu_freq_counter * 5)
+            pos_gpu_volt = pos_gpu_freq + 3
             self.data['GPU freq table'].append({
-                'name': 'DPM ' + str(gpu_freq_counter),
+                'name': 'DPM ' + str(gpu_freq_counter) + ' : frequency',
                 'value': str(BytesReader.read_int24(self.rom, pos_gpu_freq)),
                 'unit': '10 KHz',
-                'position': str(hex(pos_gpu_freq))
+                'position': str(hex(pos_gpu_freq)),
+                'length' : '24 bits'
+            })
+            self.data['GPU freq table'].append({
+                'name': 'DPM ' + str(gpu_freq_counter) + ' : voltage',
+                'value': str(BytesReader.read_int16(self.rom, pos_gpu_volt)),
+                'unit': '10 KHz',
+                'position': str(hex(pos_gpu_volt)),
+                'length' : '16 bits'
             })
 
         # Start VCE limit tables
@@ -420,16 +476,18 @@ class HawaiiBios:
             'name': 'Start VCE limit table count',
             'value': str(self.StartVCELimitTable_count),
             'unit': '',
-            'position': str(hex(self.pos_StartVCELimitTable))
+            'position': str(hex(self.pos_StartVCELimitTable)),
+            'length' : '8 bits'
         })
 
         for vce in range(self.StartVCELimitTable_count):
             pos_vce = self.powerTablePosition + self.VCELimitTableOffset + 1 + (vce * 3)
             self.data['Start VCE limit table'].append({
-                'name': 'DPM ' + str(BytesReader.read_int8(self.rom, pos_vce + 2)),
+                'name': 'DPM ' + str(vce) + ' : ' + str(BytesReader.read_int8(self.rom, pos_vce + 2)),
                 'value': str(BytesReader.read_int16(self.rom, pos_vce)),
                 'unit': 'mV',
-                'position': str(hex(pos_vce))
+                'position': str(hex(pos_vce)),
+                'length' : '16 bits'
             })
 
         # Start UVD limit tables
@@ -440,16 +498,18 @@ class HawaiiBios:
             'name': 'Start UVD limit table count',
             'value': str(self.StartUVDLimitTable_count),
             'unit': '',
-            'position': str(hex(self.pos_StartUVDLimitTable))
+            'position': str(hex(self.pos_StartUVDLimitTable)),
+            'length' : '8 bits'
         })
 
         for uvd in range(self.StartUVDLimitTable_count):
             pos_uvd = self.powerTablePosition + self.UVDLimitTableOffset + 1 + (uvd * 3)
             self.data['Start UVD limit table'].append({
-                'name': 'DPM ' + str(BytesReader.read_int8(self.rom, pos_uvd + 2)),
+                'name': 'DPM ' + str(uvd) + ' : ' + str(BytesReader.read_int8(self.rom, pos_uvd + 2)),
                 'value': str(BytesReader.read_int16(self.rom, pos_uvd)),
                 'unit': 'mV',
-                'position': str(hex(pos_uvd))
+                'position': str(hex(pos_uvd)),
+                'length' : '16 bits'
             })
 
         # Start SAMU limit tables
@@ -460,16 +520,18 @@ class HawaiiBios:
             'name': 'Start SAMU limit table count',
             'value': str(self.StartSAMULimitTable_count),
             'unit': '',
-            'position': str(hex(self.pos_StartSAMULimitTable))
+            'position': str(hex(self.pos_StartSAMULimitTable)),
+            'length' : '8 bits'
         })
 
         for samu in range(self.StartSAMULimitTable_count):
             pos_samu = self.powerTablePosition + self.SAMULimitTableOffset + 2 + (samu * 5)
             self.data['Start SAMU limit table'].append({
-                'name': 'DPM ' + str(BytesReader.read_int24(self.rom, pos_samu + 2)),
+                'name': 'DPM ' + str(samu) + ' : ' + str(BytesReader.read_int24(self.rom, pos_samu + 2)),
                 'value': str(BytesReader.read_int16(self.rom, pos_samu)),
                 'unit': 'mV',
-                'position': str(hex(pos_samu))
+                'position': str(hex(pos_samu)),
+                'length' : '16 bits'
             })
 
         # Start ACP limit tables
@@ -480,79 +542,91 @@ class HawaiiBios:
             'name': 'Start ACP limit table count',
             'value': str(self.StartACPLimitTable_count),
             'unit': '',
-            'position': str(hex(self.pos_StartACPLimitTable))
+            'position': str(hex(self.pos_StartACPLimitTable)),
+            'length' : '8 bits'
         })
 
         for acp in range(self.StartACPLimitTable_count):
             pos_acp = self.powerTablePosition + self.ACPLimitTableOffset + 2 + (acp * 5)
             self.data['Start ACP limit table'].append({
-                'name': 'DPM ' + str(BytesReader.read_int24(self.rom, pos_acp + 2)),
+                'name': 'DPM ' + str(acp) + ' : ' + str(BytesReader.read_int24(self.rom, pos_acp + 2)),
                 'value': str(BytesReader.read_int16(self.rom, pos_acp)),
                 'unit': 'mV',
-                'position': str(hex(pos_samu))
+                'position': str(hex(pos_samu)),
+                'length' : '16 bits'
             })
 
         # Fan Profile
 
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Temp hysteresis',
             'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 1)),
             'unit': '°C',
-            'position': str(hex(self.fanTablePosition + 1))
+            'position': str(hex(self.fanTablePosition + 1)),
+            'length' : '8 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Temp target 1',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 2)),
             'unit': '/ 100 - °C',
-            'position': str(hex(self.fanTablePosition + 2))
+            'position': str(hex(self.fanTablePosition + 2)),
+            'length' : '16 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Temp target 2',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 4)),
             'unit': '/ 100 - °C',
-            'position': str(hex(self.fanTablePosition + 4))
+            'position': str(hex(self.fanTablePosition + 4)),
+            'length' : '16 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Temp target 3',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 6)),
             'unit': '/ 100 - °C',
-            'position': str(hex(self.fanTablePosition + 6))
+            'position': str(hex(self.fanTablePosition + 6)),
+            'length' : '16 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Fan speed 1',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 8)),
             'unit': '/ 100 - %',
-            'position': str(hex(self.fanTablePosition + 8))
+            'position': str(hex(self.fanTablePosition + 8)),
+            'length' : '16 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Fan speed 2',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 10)),
             'unit': '/ 100 - %',
-            'position': str(hex(self.fanTablePosition + 10))
+            'position': str(hex(self.fanTablePosition + 10)),
+            'length' : '16 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Fan speed 3',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 12)),
             'unit': '/ 100 - %',
-            'position': str(hex(self.fanTablePosition + 12))
+            'position': str(hex(self.fanTablePosition + 12)),
+            'length' : '16 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Max temp',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 14)),
             'unit': '/ 100 - °C',
-            'position': str(hex(self.fanTablePosition + 14))
+            'position': str(hex(self.fanTablePosition + 14)),
+            'length' : '16 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'Fan control type',
             'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 16)),
             'unit': '°C',
-            'position': str(hex(self.fanTablePosition + 16))
+            'position': str(hex(self.fanTablePosition + 16)),
+            'length' : '8 bits'
         })
         self.data['Fan Profile'].append({
-            'name': 'DPM',
+            'name': 'PWM fan max',
             'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 17)),
             'unit': '%',
-            'position': str(hex(self.fanTablePosition + 17))
+            'position': str(hex(self.fanTablePosition + 17)),
+            'length' : '8 bits'
         })
 
         # VRM settings
@@ -563,7 +637,8 @@ class HawaiiBios:
             'name': 'VRM table count',
             'value': str(self.vrmList_size),
             'unit': '',
-            'position': str(hex(self.pos_vrmList_size))
+            'position': str(hex(self.pos_vrmList_size)),
+            'length' : '16 bits'
         })
 
         for vrm in range(2, self.vrmList_size, 2):
@@ -575,8 +650,8 @@ class HawaiiBios:
                     'name': vrm_types[hex(temp)],
                     'value': str(value),
                     'unit': '',
-                    'position': str(hex(pos_temp))
+                    'position': str(hex(pos_temp)),
+                    'length' : '16 bits'
                 })
             else:
                 print('unknow VRM :', hex(temp), '@', hex(pos_temp))
-
