@@ -27,6 +27,18 @@ vrm_types = {
     '0x8e': 'VDDCI Offset'
 }
 
+vrm_unit = {
+    '0x22': 'Hz',
+    '0x23': 'Hz',
+    '0x26': '',
+    '0x33': '',
+    '0x34': 'A',
+    '0x38': '',
+    '0x3d': 'mV',
+    '0x8d': 'mV',
+    '0x8e': 'mV'
+}
+
 
 class HawaiiBios:
 
@@ -649,9 +661,11 @@ class HawaiiBios:
                 self.data['VRM settings'].append({
                     'name': vrm_types[hex(temp)],
                     'value': str(value),
-                    'unit': '',
+                    'unit': vrm_unit[hex(temp)],
                     'position': str(hex(pos_temp)),
                     'length' : '16 bits'
                 })
             else:
                 print('unknow VRM :', hex(temp), '@', hex(pos_temp))
+
+        print(self.data)
