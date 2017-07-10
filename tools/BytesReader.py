@@ -23,16 +23,6 @@ def read_int16(octet: bytes, pos: int, big_endian: bool = False):
     return struct.unpack(int16_format, octet[pos:pos + 2])[0]
 
 
-def read_int32(octet: bytes, pos: int, big_endian: bool = False):
-    # print('reading int32 @' + str(pos), 'in', 'big endian' if big_endian else 'little endian')
-    int32_format = 'I'
-    if big_endian:
-        int32_format = '>' + int32_format
-    else:
-        int32_format = '<' + int32_format
-    return struct.unpack(int32_format, octet[pos:pos + 4])[0]
-
-
 def read_int24(octet: bytes, pos: int, big_endian: bool = False):
     # print('reading int24 @' + str(pos), 'in', 'big endian' if big_endian else 'little endian')
     int24_format = 'I'  # int32 but on a 24 bit + a 8 bit null padding
@@ -41,6 +31,16 @@ def read_int24(octet: bytes, pos: int, big_endian: bool = False):
     else:
         int24_format = '<' + int24_format
     return struct.unpack(int24_format, octet[pos:pos + 3] + '\0'.encode('ASCII'))[0]
+
+
+def read_int32(octet: bytes, pos: int, big_endian: bool = False):
+    # print('reading int32 @' + str(pos), 'in', 'big endian' if big_endian else 'little endian')
+    int32_format = 'I'
+    if big_endian:
+        int32_format = '>' + int32_format
+    else:
+        int32_format = '<' + int32_format
+    return struct.unpack(int32_format, octet[pos:pos + 4])[0]
 
 
 def read_str(octet: bytes, pos: int, length: int, big_endian: bool = False):
