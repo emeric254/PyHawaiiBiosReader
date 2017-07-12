@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from tools import RomReader
+from tools import RomReader, RomWriter
 from tools.HawaiiBios import HawaiiBios
 
 import gi
@@ -12,6 +12,13 @@ from gi.repository import Gtk
 
 rom = None
 bios = None
+
+
+def save_rom(file_name):
+    RomWriter.write_rom(file_name, rom)
+    info_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Bios file saved")
+    info_dialog.run()
+    info_dialog.destroy()
 
 
 def load_rom(file_name):
@@ -23,6 +30,7 @@ def load_rom(file_name):
     error_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Verify this file is a bios rom")
     error_dialog.run()
     error_dialog.destroy()
+
 
 def load_bios():
     global bios
@@ -104,7 +112,8 @@ class Handler:
             dialog = Gtk.FileChooserDialog("Save bios file", main_window, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                print("File saved: " + dialog.get_filename())
+                file_name = dialog.get_filename()
+                save_rom(file_name)
         finally:
             dialog.destroy()
 
