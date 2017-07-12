@@ -16,6 +16,10 @@ bios = None
 def load_rom(file_name):
     global bios
     bios = HawaiiBios(RomReader.read_rom(file_name))
+    if not bios.is_supported():
+        warning_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, "Please care, this device id is not listed as supported")
+        warning_dialog.run()
+        warning_dialog.destroy()
 
 
 def load_sections():
@@ -56,27 +60,36 @@ class Handler:
 
     @staticmethod
     def onOpenFile(*args):
-        dialog = Gtk.FileChooserDialog("Open bios file", main_window, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            file_name = dialog.get_filename()
-            print('File selected:', file_name)
-            #
-            load_rom(file_name)
-            #
-            section_list_store.clear()
-            field_list_store.clear()
-            #
-            load_sections()
-        dialog.destroy()
+        try:
+            dialog = Gtk.FileChooserDialog("Open bios file", main_window, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                file_name = dialog.get_filename()
+                if not file_name.endswith('.rom'):
+                    raise ValueError
+                #
+                load_rom(file_name)
+                #
+                section_list_store.clear()
+                field_list_store.clear()
+                #
+                load_sections()
+        except ValueError:
+            error_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Verify this file is a bios rom")
+            error_dialog.run()
+            error_dialog.destroy()
+        finally:
+            dialog.destroy()
 
     @staticmethod
     def onSaveFile(*args):
-        dialog = Gtk.FileChooserDialog("Save bios file", main_window, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            print("File saved: " + dialog.get_filename())
-        dialog.destroy()
+        try:
+            dialog = Gtk.FileChooserDialog("Save bios file", main_window, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                print("File saved: " + dialog.get_filename())
+        finally:
+            dialog.destroy()
 
 
 builder = Gtk.Builder()
