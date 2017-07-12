@@ -10,28 +10,44 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+rom = None
 bios = None
 
 
 def load_rom(file_name):
+    global rom
+    rom = None
+    if file_name.endswith('.rom'):
+        rom = RomReader.read_rom(file_name)
+        return
+    error_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Verify this file is a bios rom")
+    error_dialog.run()
+    error_dialog.destroy()
+
+def load_bios():
     global bios
-    bios = HawaiiBios(RomReader.read_rom(file_name))
-    if not bios.is_supported():
-        warning_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, "Please care, this device id is not listed as supported")
-        warning_dialog.run()
-        warning_dialog.destroy()
+    bios = None
+    if rom:
+        bios = HawaiiBios(rom)
+        if not bios.is_supported():
+            warning_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, "Please care, this device id is not listed as supported")
+            warning_dialog.run()
+            warning_dialog.destroy()
 
 
 def load_sections():
+    field_list_store.clear()
     section_list_store.clear()
-    for key in sorted(bios.data.keys()):
-        section_list_store.append([key])
+    if bios:
+        for key in sorted(bios.data.keys()):
+            section_list_store.append([key])
 
 
 def load_fields(section):
     field_list_store.clear()
-    for row in bios.data[section]:
-        field_list_store.append([row['name'], row['value'], row['unit'], row['position'], row['length']])
+    if bios:
+        for row in bios.data[section]:
+            field_list_store.append([row['name'], row['value'], row['unit'], row['position'], row['length']])
 
 
 class Handler:
@@ -65,19 +81,9 @@ class Handler:
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 file_name = dialog.get_filename()
-                if not file_name.endswith('.rom'):
-                    raise ValueError
-                #
                 load_rom(file_name)
-                #
-                section_list_store.clear()
-                field_list_store.clear()
-                #
+                load_bios()
                 load_sections()
-        except ValueError:
-            error_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Verify this file is a bios rom")
-            error_dialog.run()
-            error_dialog.destroy()
         finally:
             dialog.destroy()
 
