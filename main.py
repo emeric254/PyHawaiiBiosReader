@@ -76,8 +76,19 @@ class Handler:
 
     @staticmethod
     def onOpenFile(*args):
+        #
+        filter_bios_rom = Gtk.FileFilter()
+        filter_bios_rom.set_name("Bios rom")
+        filter_bios_rom.add_pattern("*.rom")
+        #
+        filter_any = Gtk.FileFilter()
+        filter_any.set_name("Any file")
+        filter_any.add_pattern("*")
+        #
+        dialog = Gtk.FileChooserDialog("Open bios file", main_window, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        dialog.add_filter(filter_bios_rom)
+        dialog.add_filter(filter_any)
         try:
-            dialog = Gtk.FileChooserDialog("Open bios file", main_window, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 file_name = dialog.get_filename()
