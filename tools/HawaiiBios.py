@@ -57,11 +57,10 @@ class HawaiiBios:
             'Fan Profile': [],
             'VRM settings': []
         }
-        self.parse()
+        self.parse_all()
 
-    def parse(self):
 
-        print('parsing rom ...')
+    def parse_positions(self):
 
         self.pos_pciInfoPosition = 24
         self.pciInfoPosition = BytesReader.read_int16(self.rom, self.pos_pciInfoPosition)
@@ -155,7 +154,8 @@ class HawaiiBios:
         self.CCCLimitsPosition = self.powerTablePosition + BytesReader.read_int16(self.rom, self.pos_CCCLimitsPosition)
         print('CCCLimitsPosition :', hex(self.CCCLimitsPosition))
 
-        # Overview
+
+    def parse_overview(self):
 
         self.pos_biosName = 220
         self.data['Overview'].append({
@@ -174,11 +174,6 @@ class HawaiiBios:
             'position': str(hex(self.pos_devIDstr)),
             'length' : '16 bits'
         })
-
-        if self.data['Overview'][-1]['value'] in supportedDevIDs:
-            print('>> Ok this rom device is supported')
-        else:
-            print('>> Warning this rom device seems not supported')
 
         self.pos_vendorID = 4 + self.pciInfoPosition
         self.data['Overview'].append({
@@ -314,7 +309,8 @@ class HawaiiBios:
             'length' : '24 bits'
         })
 
-        # Powerplay
+
+    def parse_powerplay(self):
 
         temp_pos = self.powerTablePosition + self.clockInfoOffset
 
@@ -389,7 +385,8 @@ class HawaiiBios:
             'length' : '16 bits'
         })
 
-        # VDDCI states
+
+    def parse_vddci(self):
 
         self.pos_vddciTableCount = self.powerTablePosition + self.AUXvoltageOffset
         self.vddciTableCount = BytesReader.read_int8(self.rom, self.pos_vddciTableCount)
@@ -419,7 +416,8 @@ class HawaiiBios:
                 'length' : '16 bits'
             })
 
-        # MEM freq table
+
+    def parse_mem_freq(self):
 
         self.pos_memoryFrequencyTableCount = self.powerTablePosition + self.memoryFrequencyTableOffset
         self.memoryFrequencyTableCount = BytesReader.read_int8(self.rom, self.pos_memoryFrequencyTableCount)
@@ -449,7 +447,8 @@ class HawaiiBios:
                 'length' : '16 bits'
             })
 
-        # GPU freq table
+
+    def parse_gpu_mem(self):
 
         self.pos_gpuFrequencyTableCount = self.powerTablePosition + self.gpuFrequencyTableOffset
         self.gpuFrequencyTableCount = BytesReader.read_int8(self.rom, self.pos_gpuFrequencyTableCount)
@@ -480,7 +479,8 @@ class HawaiiBios:
                 'length' : '16 bits'
             })
 
-        # Start VCE limit tables
+
+    def parse_vce_limit(self):
 
         self.pos_StartVCELimitTable = self.powerTablePosition + self.VCELimitTableOffset
         self.StartVCELimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartVCELimitTable)
@@ -502,7 +502,8 @@ class HawaiiBios:
                 'length' : '16 bits'
             })
 
-        # Start UVD limit tables
+
+    def parse_uvd_limit(self):
 
         self.pos_StartUVDLimitTable = self.powerTablePosition + self.UVDLimitTableOffset
         self.StartUVDLimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartUVDLimitTable)
@@ -524,7 +525,8 @@ class HawaiiBios:
                 'length' : '16 bits'
             })
 
-        # Start SAMU limit tables
+
+    def parse_samu_limit(self):
 
         self.pos_StartSAMULimitTable = self.powerTablePosition + self.SAMULimitTableOffset + 1
         self.StartSAMULimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartSAMULimitTable)
@@ -546,7 +548,8 @@ class HawaiiBios:
                 'length' : '16 bits'
             })
 
-        # Start ACP limit tables
+
+    def parse_acp_limit(self):
 
         self.pos_StartACPLimitTable = self.powerTablePosition + self.ACPLimitTableOffset + 1
         self.StartACPLimitTable_count = BytesReader.read_int8(self.rom, self.pos_StartACPLimitTable)
@@ -564,11 +567,12 @@ class HawaiiBios:
                 'name': 'DPM ' + str(acp) + ' : ' + str(BytesReader.read_int24(self.rom, pos_acp + 2)),
                 'value': str(BytesReader.read_int16(self.rom, pos_acp)),
                 'unit': 'mV',
-                'position': str(hex(pos_samu)),
+                'position': str(hex(pos_acp)),
                 'length' : '16 bits'
             })
 
-        # Fan Profile
+
+    def parse_fan_profile(self):
 
         self.data['Fan Profile'].append({
             'name': 'Temp hysteresis',
@@ -577,6 +581,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 1)),
             'length' : '8 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Temp target 1',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 2)),
@@ -584,6 +589,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 2)),
             'length' : '16 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Temp target 2',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 4)),
@@ -591,6 +597,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 4)),
             'length' : '16 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Temp target 3',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 6)),
@@ -598,6 +605,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 6)),
             'length' : '16 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Fan speed 1',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 8)),
@@ -605,6 +613,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 8)),
             'length' : '16 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Fan speed 2',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 10)),
@@ -612,6 +621,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 10)),
             'length' : '16 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Fan speed 3',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 12)),
@@ -619,6 +629,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 12)),
             'length' : '16 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Max temp',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 14)),
@@ -626,6 +637,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 14)),
             'length' : '16 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'Fan control type',
             'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 16)),
@@ -633,6 +645,7 @@ class HawaiiBios:
             'position': str(hex(self.fanTablePosition + 16)),
             'length' : '8 bits'
         })
+
         self.data['Fan Profile'].append({
             'name': 'PWM fan max',
             'value': str(BytesReader.read_int8(self.rom, self.fanTablePosition + 17)),
@@ -641,7 +654,8 @@ class HawaiiBios:
             'length' : '8 bits'
         })
 
-        # VRM settings
+
+    def parse_vrm_setting(self):
 
         self.pos_vrmList_size = self.gpuVRMTablePosition + 6
         self.vrmList_size = BytesReader.read_int16(self.rom, self.pos_vrmList_size)
@@ -668,4 +682,37 @@ class HawaiiBios:
             else:
                 print('unknow VRM :', hex(temp), '@', hex(pos_temp))
 
+
+    def parse_all(self):
+
+        print('parsing rom ...')
+
+        self.parse_positions()
+
+        self.parse_overview()
+
+        self.parse_powerplay()
+
+        self.parse_vddci()
+
+        self.parse_mem_freq()
+
+        self.parse_gpu_mem()
+
+        self.parse_vce_limit()
+
+        self.parse_uvd_limit()
+
+        self.parse_samu_limit()
+
+        self.parse_acp_limit()
+
+        self.parse_fan_profile()
+
+        self.parse_vrm_setting()
+
         print(self.data)
+
+
+    def is_supported(self):
+        return any(f['name'] == 'dev id' and f['value'] in supportedDevIDs for f in self.data['Overview'])
