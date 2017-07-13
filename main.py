@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from tools import RomReader
+from tools import RomReader, RomWriter, BytesWriter
 from tools.HawaiiBios import HawaiiBios
 
 import gi
@@ -13,21 +13,46 @@ from gi.repository import Gtk
 bios = None
 
 
+def save_rom(file_name):
+    if bios:
+        rom = HawaiiBios.calculate_checksum(bios.rom)
+        RomWriter.write_rom(file_name, rom)
+        info_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Bios file saved")
+        info_dialog.run()
+        info_dialog.destroy()
+
+
 def load_rom(file_name):
     global bios
-    bios = HawaiiBios(RomReader.read_rom(file_name))
+    bios = None
+    rom = None
+    if not file_name.endswith('.rom'):
+        error_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Verify this file is a bios rom")
+        error_dialog.run()
+        error_dialog.destroy()
+        return
+    rom = RomReader.read_rom(file_name)
+    if rom:
+        bios = HawaiiBios(rom)
+        if not bios.is_supported():
+            warning_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, "Please care, this device id is not listed as supported")
+            warning_dialog.run()
+            warning_dialog.destroy()
 
 
 def load_sections():
+    field_list_store.clear()
     section_list_store.clear()
-    for key in sorted(bios.data.keys()):
-        section_list_store.append([key])
+    if bios:
+        for key in sorted(bios.data.keys()):
+            section_list_store.append([key])
 
 
 def load_fields(section):
     field_list_store.clear()
-    for row in bios.data[section]:
-        field_list_store.append([row['name'], row['value'], row['unit'], row['position'], row['length']])
+    if bios:
+        for row in bios.data[section]:
+            field_list_store.append([row['name'], row['value'], row['unit'], row['position'], row['length']])
 
 
 class Handler:
@@ -45,9 +70,20 @@ class Handler:
         open_window.hide()
 
     @staticmethod
-    def onEditValue(cell, path, new_text):
-        field_list_store[path][1] = new_text
-        print(field_list_store[path][1])
+    def onEditValue(cell, path, new_value):
+        field_list_store[path][1] = new_value
+        pos = int(field_list_store[path][3], 0)
+        length = field_list_store[path][4]
+        if length == '8 bits':
+            BytesWriter.write_int8(bios.rom, pos, int(new_value))
+        if length == '16 bits':
+            BytesWriter.write_int16(bios.rom, pos, int(new_value))
+        if length == '24 bits':
+            BytesWriter.write_int24(bios.rom, pos, int(new_value))
+        if length == '32 bits':
+            BytesWriter.write_int32(bios.rom, pos, int(new_value))
+        if length.endswith('chars'):
+            BytesWriter.write_str(bios.rom, pos, int(length.split(' ')[0]), new_value)
 
     @staticmethod
     def onSectionChoice(cell, data=None):
@@ -56,27 +92,37 @@ class Handler:
 
     @staticmethod
     def onOpenFile(*args):
+        #
+        filter_bios_rom = Gtk.FileFilter()
+        filter_bios_rom.set_name("Bios rom")
+        filter_bios_rom.add_pattern("*.rom")
+        #
+        filter_any = Gtk.FileFilter()
+        filter_any.set_name("Any file")
+        filter_any.add_pattern("*")
+        #
         dialog = Gtk.FileChooserDialog("Open bios file", main_window, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            file_name = dialog.get_filename()
-            print('File selected:', file_name)
-            #
-            load_rom(file_name)
-            #
-            section_list_store.clear()
-            field_list_store.clear()
-            #
-            load_sections()
-        dialog.destroy()
+        dialog.add_filter(filter_bios_rom)
+        dialog.add_filter(filter_any)
+        try:
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                file_name = dialog.get_filename()
+                load_rom(file_name)
+                load_sections()
+        finally:
+            dialog.destroy()
 
     @staticmethod
     def onSaveFile(*args):
-        dialog = Gtk.FileChooserDialog("Save bios file", main_window, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            print("File saved: " + dialog.get_filename())
-        dialog.destroy()
+        try:
+            dialog = Gtk.FileChooserDialog("Save bios file", main_window, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                file_name = dialog.get_filename()
+                save_rom(file_name)
+        finally:
+            dialog.destroy()
 
 
 builder = Gtk.Builder()
