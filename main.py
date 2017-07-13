@@ -10,31 +10,28 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-rom = None
 bios = None
 
 
 def save_rom(file_name):
-    RomWriter.write_rom(file_name, rom)
-    info_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Bios file saved")
-    info_dialog.run()
-    info_dialog.destroy()
+    if bios:
+        rom = HawaiiBios.calculate_checksum(bios.rom)
+        RomWriter.write_rom(file_name, rom)
+        info_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Bios file saved")
+        info_dialog.run()
+        info_dialog.destroy()
 
 
 def load_rom(file_name):
-    global rom
-    rom = None
-    if file_name.endswith('.rom'):
-        rom = RomReader.read_rom(file_name)
-        return
-    error_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Verify this file is a bios rom")
-    error_dialog.run()
-    error_dialog.destroy()
-
-
-def load_bios():
     global bios
     bios = None
+    rom = None
+    if not file_name.endswith('.rom'):
+        error_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Verify this file is a bios rom")
+        error_dialog.run()
+        error_dialog.destroy()
+        return
+    rom = RomReader.read_rom(file_name)
     if rom:
         bios = HawaiiBios(rom)
         if not bios.is_supported():
@@ -101,7 +98,6 @@ class Handler:
             if response == Gtk.ResponseType.OK:
                 file_name = dialog.get_filename()
                 load_rom(file_name)
-                load_bios()
                 load_sections()
         finally:
             dialog.destroy()
