@@ -4,6 +4,10 @@ from pprint import pprint
 from tools import BytesReader
 
 supportedDevIDs = {
+    '0x6658',
+    '0x665c',
+    '0x665d',
+    '0x665f',
     '0x67a0',
     '0x67a1',
     '0x67a2',
@@ -12,7 +16,7 @@ supportedDevIDs = {
     '0x67aa',
     '0x67b0',
     '0x67b1',
-    '0x67b9'
+    '0x67b9',
 }
 
 vrm_types = {
@@ -38,6 +42,20 @@ vrm_unit = {
     '0x8d': 'mV',
     '0x8e': 'mV'
 }
+
+
+def calculate_checksum(rom: bytes):
+    oldchecksum = rom[33]
+    size = rom[2] * 512
+    newchecksum = 0
+    for i in size:
+        newchecksum += rom[i]
+    if oldchecksum == (rom[33] - newchecksum):
+        print('checksum ok')
+    else:
+        print('wrong checksum')
+    rom[33] -= newchecksum;
+    print('checksum saved')
 
 
 class HawaiiBios:
@@ -242,7 +260,7 @@ class HawaiiBios:
             'value': str(hex(BytesReader.read_int16(self.rom, self.pos_revisionLevel))),
             'unit': '',
             'position': str(hex(self.pos_revisionLevel)),
-            'length' : '16bits'
+            'length' : '16 bits'
         })
 
         self.pos_codeType = 20 + self.pciInfoPosition
@@ -585,7 +603,7 @@ class HawaiiBios:
         self.data['Fan Profile'].append({
             'name': 'Temp target 1',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 2)),
-            'unit': '/ 100 - °C',
+            'unit': '100 °C',
             'position': str(hex(self.fanTablePosition + 2)),
             'length' : '16 bits'
         })
@@ -593,7 +611,7 @@ class HawaiiBios:
         self.data['Fan Profile'].append({
             'name': 'Temp target 2',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 4)),
-            'unit': '/ 100 - °C',
+            'unit': '100 °C',
             'position': str(hex(self.fanTablePosition + 4)),
             'length' : '16 bits'
         })
@@ -601,7 +619,7 @@ class HawaiiBios:
         self.data['Fan Profile'].append({
             'name': 'Temp target 3',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 6)),
-            'unit': '/ 100 - °C',
+            'unit': '100 °C',
             'position': str(hex(self.fanTablePosition + 6)),
             'length' : '16 bits'
         })
@@ -609,7 +627,7 @@ class HawaiiBios:
         self.data['Fan Profile'].append({
             'name': 'Fan speed 1',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 8)),
-            'unit': '/ 100 - %',
+            'unit': '100 %',
             'position': str(hex(self.fanTablePosition + 8)),
             'length' : '16 bits'
         })
@@ -617,7 +635,7 @@ class HawaiiBios:
         self.data['Fan Profile'].append({
             'name': 'Fan speed 2',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 10)),
-            'unit': '/ 100 - %',
+            'unit': '100 %',
             'position': str(hex(self.fanTablePosition + 10)),
             'length' : '16 bits'
         })
@@ -625,7 +643,7 @@ class HawaiiBios:
         self.data['Fan Profile'].append({
             'name': 'Fan speed 3',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 12)),
-            'unit': '/ 100 - %',
+            'unit': '100 %',
             'position': str(hex(self.fanTablePosition + 12)),
             'length' : '16 bits'
         })
@@ -633,7 +651,7 @@ class HawaiiBios:
         self.data['Fan Profile'].append({
             'name': 'Max temp',
             'value': str(BytesReader.read_int16(self.rom, self.fanTablePosition + 14)),
-            'unit': '/ 100 - °C',
+            'unit': '100 °C',
             'position': str(hex(self.fanTablePosition + 14)),
             'length' : '16 bits'
         })
@@ -710,8 +728,6 @@ class HawaiiBios:
         self.parse_fan_profile()
 
         self.parse_vrm_setting()
-
-        print(self.data)
 
 
     def is_supported(self):
