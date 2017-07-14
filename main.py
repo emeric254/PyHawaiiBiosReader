@@ -1,9 +1,8 @@
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import sys
-from tools import RomReader, RomWriter
+from tools import RomReader, RomWriter, BytesWriter
 from tools.HawaiiBios import HawaiiBios
 
 import gi
@@ -70,9 +69,20 @@ class Handler:
         open_window.hide()
 
     @staticmethod
-    def onEditValue(cell, path, new_text):
-        field_list_store[path][1] = new_text
-        print(field_list_store[path][1])
+    def onEditValue(cell, path, new_value):
+        field_list_store[path][1] = new_value
+        pos = int(field_list_store[path][3], 0)
+        length = field_list_store[path][4]
+        if length == '8 bits':
+            BytesWriter.write_int8(bios.rom, pos, int(new_value))
+        if length == '16 bits':
+            BytesWriter.write_int16(bios.rom, pos, int(new_value))
+        if length == '24 bits':
+            BytesWriter.write_int24(bios.rom, pos, int(new_value))
+        if length == '32 bits':
+            BytesWriter.write_int32(bios.rom, pos, int(new_value))
+        if length.endswith('chars'):
+            BytesWriter.write_str(bios.rom, pos, int(length.split(' ')[0]), new_value)
 
     @staticmethod
     def onSectionChoice(cell, data=None):
