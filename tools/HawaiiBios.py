@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from pprint import pprint
-from tools import BytesReader
+from tools import BytesReader, BytesWriter
 
 supportedDevIDs = {
     '0x6658',
@@ -44,21 +44,23 @@ vrm_unit = {
 }
 
 
-def calculate_checksum(rom: bytes):
-    oldchecksum = rom[33]
-    size = rom[2] * 512
-    newchecksum = 0
-    for i in size:
-        newchecksum += rom[i]
-    if oldchecksum == (rom[33] - newchecksum):
-        print('checksum ok')
-    else:
-        print('wrong checksum')
-    rom[33] -= newchecksum;
-    print('checksum saved')
-
-
 class HawaiiBios:
+
+    @staticmethod
+    def calculate_checksum(rom: bytes):
+        oldchecksum = BytesReader.read_int8(rom, 33)
+        size = BytesReader.read_int8(rom, 2) * 512
+
+        newchecksum = oldchecksum - sum(rom[i] for i in range(size)) % 256
+
+        if oldchecksum == newchecksum:
+            print('checksum ok')
+        else:
+            print('wrong checksum')
+
+        BytesWriter.write_int8(rom, 33, newchecksum)
+        print('checksum saved')
+
 
     def __init__(self, rom: bytes):
         self.rom = rom
