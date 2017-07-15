@@ -14,8 +14,8 @@ bios = None
 
 def save_rom(file_name):
     if bios:
-        rom = HawaiiBios.calculate_checksum(bios.rom)
-        RomWriter.write_rom(file_name, rom)
+        bios.calculate_checksum()
+        RomWriter.write_rom(file_name, bios.rom)
         info_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Bios file saved")
         info_dialog.run()
         info_dialog.destroy()
