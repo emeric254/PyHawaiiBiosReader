@@ -3,7 +3,7 @@
 
 import sys
 from tools import RomReader, RomWriter, BytesReader, BytesWriter
-from tools.TongaBios import TongaBios
+from tools.HawaiiBios import HawaiiBios
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -32,7 +32,7 @@ def load_rom(file_name):
         return
     rom = RomReader.read_rom(file_name)
     if rom:
-        bios = TongaBios(rom)
+        bios = HawaiiBios(rom)
         if not bios.is_supported():
             warning_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, "Please care, this device id is not listed as supported")
             warning_dialog.run()
