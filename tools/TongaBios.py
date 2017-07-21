@@ -49,14 +49,14 @@ class TongaBios:
         oldchecksum = BytesReader.read_int8(self.rom, 33)
         size = BytesReader.read_int8(self.rom, 2) * 512
 
-        newchecksum = oldchecksum - sum(BytesReader.read_int8(self.rom, i) for i in range(size)) % 256
+        newchecksum = oldchecksum - sum(BytesReader.read_int8(self.rom, i) for i in range(size))
 
         if oldchecksum == newchecksum:
             print('checksum ok')
         else:
             print('wrong checksum')
 
-        self.rom = BytesWriter.write_int8(self.rom, 33, newchecksum)
+        self.rom = BytesWriter.write_int8(self.rom, 33, newchecksum % 256)
         print('checksum saved')
 
     def find_pattern(self, pattern: tuple):  # TODO check that
