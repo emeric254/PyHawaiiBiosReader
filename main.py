@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from tools import RomReader, RomWriter, BytesWriter
-from tools.HawaiiBios import HawaiiBios
+from tools import RomReader, RomWriter, BytesReader, BytesWriter
+from tools.TongaBios import TongaBios
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -32,7 +32,7 @@ def load_rom(file_name):
         return
     rom = RomReader.read_rom(file_name)
     if rom:
-        bios = HawaiiBios(rom)
+        bios = TongaBios(rom)
         if not bios.is_supported():
             warning_dialog = Gtk.MessageDialog(main_window, 0, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, "Please care, this device id is not listed as supported")
             warning_dialog.run()
@@ -74,15 +74,15 @@ class Handler:
         pos = int(field_list_store[path][3], 0)
         length = field_list_store[path][4]
         if length == '8 bits':
-            BytesWriter.write_int8(bios.rom, pos, int(new_value))
+            bios.rom = BytesWriter.write_int8(bios.rom, pos, int(new_value))
         if length == '16 bits':
-            BytesWriter.write_int16(bios.rom, pos, int(new_value))
+            bios.rom = BytesWriter.write_int16(bios.rom, pos, int(new_value))
         if length == '24 bits':
-            BytesWriter.write_int24(bios.rom, pos, int(new_value))
+            bios.rom = BytesWriter.write_int24(bios.rom, pos, int(new_value))
         if length == '32 bits':
-            BytesWriter.write_int32(bios.rom, pos, int(new_value))
+            bios.rom = BytesWriter.write_int32(bios.rom, pos, int(new_value))
         if length.endswith('chars'):
-            BytesWriter.write_str(bios.rom, pos, int(length.split(' ')[0]), new_value)
+            bios.rom = BytesWriter.write_str(bios.rom, pos, int(length.split(' ')[0]), new_value)
 
     @staticmethod
     def onSectionChoice(cell, data=None):
