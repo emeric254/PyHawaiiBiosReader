@@ -56,7 +56,7 @@ class TongaBios:
         else:
             print('wrong checksum')
 
-        BytesWriter.write_int8(self.rom, 33, newchecksum)
+        self.rom = BytesWriter.write_int8(self.rom, 33, newchecksum)
         print('checksum saved')
 
     def find_pattern(self, pattern: tuple):  # TODO check that
