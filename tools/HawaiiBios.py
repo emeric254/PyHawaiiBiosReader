@@ -461,7 +461,7 @@ class HawaiiBios:
             self.data['MEM freq table'].append({
                 'name': 'DPM ' + str(mem_freq_counter) + ' : voltage',
                 'value': str(BytesReader.read_int16(self.rom, pos_mem_volt)),
-                'unit': '10 KHz',
+                'unit': 'mV',
                 'position': str(hex(pos_mem_volt)),
                 'length' : '16 bits'
             })
@@ -493,7 +493,7 @@ class HawaiiBios:
             self.data['GPU freq table'].append({
                 'name': 'DPM ' + str(gpu_freq_counter) + ' : voltage',
                 'value': str(BytesReader.read_int16(self.rom, pos_gpu_volt)),
-                'unit': '10 KHz',
+                'unit': 'mV',
                 'position': str(hex(pos_gpu_volt)),
                 'length' : '16 bits'
             })
