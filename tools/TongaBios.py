@@ -46,10 +46,10 @@ class TongaBios:
         self.parse_all()
 
     def calculate_checksum(self):
-        oldchecksum = BytesReader.read_int8(self.rom, 33)
-        size = BytesReader.read_int8(self.rom, 2) * 512
+        oldchecksum = BytesReader.read_uint8(self.rom, 33)
+        size = BytesReader.read_uint8(self.rom, 2) * 512
 
-        newchecksum = oldchecksum - sum(BytesReader.read_int8(self.rom, i) for i in range(size))
+        newchecksum = oldchecksum - sum(BytesReader.read_uint8(self.rom, i) for i in range(size))
 
         if oldchecksum == newchecksum:
             print('checksum ok')
@@ -63,7 +63,7 @@ class TongaBios:
         for i in range(len(self.rom) - len(pattern)):
             buf = []
             for j in range(len(pattern)):
-                buf.append(BytesReader.read_int8(self.rom, i + j))
+                buf.append(BytesReader.read_uint8(self.rom, i + j))
             if tuple(buf) == pattern:
                 return i - 1  # TODO this -1 seems odd
 
@@ -81,7 +81,7 @@ class TongaBios:
         print('powerTablePosition :', hex(self.powerTablePosition))
 
         if self.powerTablePosition is not None:
-            self.powerTableSize = BytesReader.read_int8(self.rom, self.powerTablePosition) + 256 * BytesReader.read_int8(self.rom, self.powerTablePosition + 1)
+            self.powerTableSize = BytesReader.read_uint8(self.rom, self.powerTablePosition) + 256 * BytesReader.read_uint8(self.rom, self.powerTablePosition + 1)
             print('powerTableSize :', hex(self.powerTableSize))
             if self.powerTableSize == 635:
                 self.fanTableOffset = 533
@@ -127,7 +127,7 @@ class TongaBios:
 
             self.data['Power table'].append({
                 'name': 'Power limit',  # TODO check that
-                'value': str(BytesReader.read_int16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset)),
+                'value': str(BytesReader.read_uint16(self.rom, self.powerTablePosition + self.powerDeliveryLimitOffset)),
                 'unit': '%',
                 'position': str(hex(self.powerTablePosition + self.powerDeliveryLimitOffset)),
                 'length' : '16 bits'
@@ -135,7 +135,7 @@ class TongaBios:
 
             self.data['Power table'].append({
                 'name': 'GPU max clock',  # TODO check that
-                'value': str(BytesReader.read_int24(self.rom, self.powerTablePosition + 23)),
+                'value': str(BytesReader.read_uint24(self.rom, self.powerTablePosition + 23)),
                 'unit': 'MHz',
                 'position': str(hex(self.powerTablePosition + 23)),
                 'length' : '24 bits'
@@ -143,7 +143,7 @@ class TongaBios:
 
             self.data['Power table'].append({
                 'name': 'MEM max clock',  # TODO check that
-                'value': str(BytesReader.read_int24(self.rom, self.powerTablePosition + 27)),
+                'value': str(BytesReader.read_uint24(self.rom, self.powerTablePosition + 27)),
                 'unit': 'MHz',
                 'position': str(hex(self.powerTablePosition + 27)),
                 'length' : '24 bits'
@@ -151,7 +151,7 @@ class TongaBios:
 
     def parse_voltagetable(self):
         if self.powerTablePosition:
-            self.voltageTable2count = BytesReader.read_int8(self.rom, self.powerTablePosition + self.voltageTable2countOffset)
+            self.voltageTable2count = BytesReader.read_uint8(self.rom, self.powerTablePosition + self.voltageTable2countOffset)
 
             self.data['Voltage table 2'].append({
                 'name': 'table count',
@@ -175,7 +175,7 @@ class TongaBios:
                 pos_voltage = self.fullvoltageTable2Offset + voltage_counter * 8
                 self.data['Voltage table 2'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 1',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
@@ -183,7 +183,7 @@ class TongaBios:
                 pos_voltage += 2
                 self.data['Voltage table 2'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 2',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
@@ -191,7 +191,7 @@ class TongaBios:
                 pos_voltage += 2
                 self.data['Voltage table 2'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 3',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
@@ -199,13 +199,13 @@ class TongaBios:
                 pos_voltage += 2
                 self.data['Voltage table 2'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 4',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
                 })
 
-            self.voltageTable3count = BytesReader.read_int8(self.rom, self.powerTablePosition + self.voltageTable3countOffset)
+            self.voltageTable3count = BytesReader.read_uint8(self.rom, self.powerTablePosition + self.voltageTable3countOffset)
 
             self.data['Voltage table 3'].append({
                 'name': 'table count',
@@ -229,7 +229,7 @@ class TongaBios:
                 pos_voltage = self.fullvoltageTable3Offset + voltage_counter * 8
                 self.data['Voltage table 3'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 1',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
@@ -237,7 +237,7 @@ class TongaBios:
                 pos_voltage += 2
                 self.data['Voltage table 3'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 2',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
@@ -245,7 +245,7 @@ class TongaBios:
                 pos_voltage += 2
                 self.data['Voltage table 3'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 3',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
@@ -253,7 +253,7 @@ class TongaBios:
                 pos_voltage += 2
                 self.data['Voltage table 3'].append({
                     'name': 'DPM ' + str(voltage_counter) + '- value 4',
-                    'value': str(BytesReader.read_int16(self.rom, pos_voltage)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_voltage)),
                     'unit': 'mV',
                     'position': str(hex(pos_voltage)),
                     'length' : '16 bits'
@@ -262,7 +262,7 @@ class TongaBios:
     def parse_mem_freq(self):
         if self.powerTablePosition:
             self.pos_memoryFrequencyTableCount = self.powerTablePosition + self.memoryFrequencyTableCountOffset
-            self.memoryFrequencyTableCount = BytesReader.read_int8(self.rom, self.pos_memoryFrequencyTableCount)
+            self.memoryFrequencyTableCount = BytesReader.read_uint8(self.rom, self.pos_memoryFrequencyTableCount)
             self.data['MEM freq table'].append({
                 'name': 'MEM freq table count',
                 'value': str(self.memoryFrequencyTableCount),
@@ -275,7 +275,7 @@ class TongaBios:
                 pos_mem_freq = self.powerTablePosition + self.memoryFrequencyTableOffset +  mem_freq_counter * 13
                 self.data['MEM freq table'].append({
                     'name': 'DPM ' + str(mem_freq_counter) + ' : frequency',
-                    'value': str(BytesReader.read_int24(self.rom, pos_mem_freq)),
+                    'value': str(BytesReader.read_uint24(self.rom, pos_mem_freq)),
                     'unit': '10 KHz',
                     'position': str(hex(pos_mem_freq)),
                     'length' : '24 bits'
@@ -284,7 +284,7 @@ class TongaBios:
     def parse_gpu_mem(self):
         if self.powerTablePosition:
             self.pos_gpuFrequencyTableCount = self.powerTablePosition + self.gpuFrequencyTableCountOffset
-            self.gpuFrequencyTableCount = BytesReader.read_int8(self.rom, self.pos_gpuFrequencyTableCount)
+            self.gpuFrequencyTableCount = BytesReader.read_uint8(self.rom, self.pos_gpuFrequencyTableCount)
             self.data['GPU freq table'].append({
                 'name': 'GPU freq table count',
                 'value': str(self.gpuFrequencyTableCount),
@@ -298,7 +298,7 @@ class TongaBios:
                 pos_gpu_volt = pos_gpu_freq + 3
                 self.data['GPU freq table'].append({
                     'name': 'DPM ' + str(gpu_freq_counter) + ' : frequency',
-                    'value': str(BytesReader.read_int24(self.rom, pos_gpu_freq)),
+                    'value': str(BytesReader.read_uint24(self.rom, pos_gpu_freq)),
                     'unit': '10 KHz',
                     'position': str(hex(pos_gpu_freq)),
                     'length' : '24 bits'
@@ -309,7 +309,7 @@ class TongaBios:
             pos_value = self.fanTablePosition + 1
             self.data['Fan table'].append({
                 'name': 'Temp hysteresis',
-                'value': str(BytesReader.read_int8(self.rom, pos_value)),
+                'value': str(BytesReader.read_uint8(self.rom, pos_value)),
                 'unit': '°C',
                 'position': str(hex(pos_value)),
                 'length' : '8 bits'
@@ -318,7 +318,7 @@ class TongaBios:
                 pos_value = self.fanTablePosition + 2 + temp_counter * 2
                 self.data['Fan table'].append({
                     'name': 'Fan temp ' + str(temp_counter + 1),
-                    'value': str(BytesReader.read_int16(self.rom, pos_value)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_value)),
                     'unit': '100 °C',
                     'position': str(hex(pos_value)),
                     'length' : '16 bits'
@@ -327,7 +327,7 @@ class TongaBios:
                 pos_value = self.fanTablePosition + 8 + speed_counter * 2
                 self.data['Fan table'].append({
                     'name': 'Fan speed ' + str(speed_counter + 1),
-                    'value': str(BytesReader.read_int16(self.rom, pos_value)),
+                    'value': str(BytesReader.read_uint16(self.rom, pos_value)),
                     'unit': '100 %',
                     'position': str(hex(pos_value)),
                     'length' : '16 bits'
@@ -335,7 +335,7 @@ class TongaBios:
             pos_value = self.fanTablePosition + 14
             self.data['Fan table'].append({
                 'name': 'Max temp',
-                'value': str(BytesReader.read_int16(self.rom, pos_value)),
+                'value': str(BytesReader.read_uint16(self.rom, pos_value)),
                 'unit': '100 °C',
                 'position': str(hex(pos_value)),
                 'length' : '16 bits'
@@ -343,7 +343,7 @@ class TongaBios:
             pos_value = self.fanTablePosition + 16
             self.data['Fan table'].append({
                 'name': 'Fan control type',
-                'value': str(BytesReader.read_int8(self.rom, pos_value)),
+                'value': str(BytesReader.read_uint8(self.rom, pos_value)),
                 'unit': '',
                 'position': str(hex(pos_value)),
                 'length' : '8 bits'
@@ -351,7 +351,7 @@ class TongaBios:
             pos_value = self.fanTablePosition + 17
             self.data['Fan table'].append({
                 'name': 'PWM fan max',
-                'value': str(BytesReader.read_int8(self.rom, pos_value)),
+                'value': str(BytesReader.read_uint8(self.rom, pos_value)),
                 'unit': '°C',
                 'position': str(hex(pos_value)),
                 'length' : '8 bits'
