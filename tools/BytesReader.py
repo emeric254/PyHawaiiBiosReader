@@ -6,8 +6,9 @@ import struct
 # normalized signed types
 
 
-def read_byte(octets: bytes, pos: int, _: bool=False):
-    return struct.unpack('b', bytes(octets[pos]))[0]
+def read_byte(octets: bytes, pos: int, big_endian: bool=False):
+    byte_format = ('>' if big_endian else '<') + 'b'
+    return struct.unpack(byte_format, bytes([octets[pos],]))[0]
 
 
 def read_short(octets: bytes, pos: int, big_endian: bool = False):
@@ -32,8 +33,8 @@ def read_longlong(octets: bytes, pos: int, big_endian: bool = False):
 
 # alternative signed types
 
-def read_int8(octets: bytes, pos: int, _: bool=False):
-    return read_byte(octets, pos)
+def read_int8(octets: bytes, pos: int, big_endian: bool=False):
+    return read_byte(octets, pos,big_endian)
 
 
 def read_int16(octets: bytes, pos: int, big_endian: bool = False):
@@ -55,8 +56,9 @@ def read_int64(octets: bytes, pos: int, big_endian: bool = False):
 # normalized unsigned types
 
 
-def read_ubyte(octets: bytes, pos: int, _: bool=False):
-    return struct.unpack('B', bytes(octets[pos]))[0]
+def read_ubyte(octets: bytes, pos: int, big_endian: bool=False):
+    byte_format = ('>' if big_endian else '<') + 'B'
+    return struct.unpack(byte_format, bytes([octets[pos],]))[0]
 
 
 def read_ushort(octets: bytes, pos: int, big_endian: bool = False):
@@ -82,8 +84,8 @@ def read_ulonglong(octets: bytes, pos: int, big_endian: bool = False):
 # alternatives unsigned types
 
 
-def read_uint8(octets: bytes, pos: int, _: bool=False):
-    return read_ubyte(octets, pos)
+def read_uint8(octets: bytes, pos: int, big_endian: bool=False):
+    return read_ubyte(octets, pos, big_endian)
 
 
 def read_uint16(octets: bytes, pos: int, big_endian: bool=False):
@@ -123,12 +125,14 @@ def read_double(octets: bytes, pos: int, big_endian: bool=False):
 # other
 
 
-def read_char(octets: bytes, pos: int, _: bool=False):
-    return struct.unpack('c', bytes(octets[pos]))[0]
+def read_char(octets: bytes, pos: int, big_endian: bool=False):
+    char_format = ('>' if big_endian else '<') + 'c'
+    return struct.unpack(char_format, bytes(octets[pos]))[0]
 
 
-def read_boolean(octets: bytes, pos: int, _: bool=False):
-    return struct.unpack('?', bytes(octets[pos]))[0]
+def read_boolean(octets: bytes, pos: int, big_endian: bool=False):
+    bool_format = ('>' if big_endian else '<') + '?'
+    return struct.unpack(bool_format, bytes(octets[pos]))[0]
 
 
 def read_str(octets: bytes, pos: int, length: int, big_endian: bool = False, encoding: str = 'utf-8'):
