@@ -3,7 +3,7 @@
 
 import sys
 from tools import RomReader, RomWriter, BytesReader, BytesWriter
-from tools.HawaiiBios import HawaiiBios
+from tools.HawaiiBios import HawaiiBios as BiosEditor
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -46,7 +46,7 @@ def load_rom(file_name):
     rom = RomReader.read_rom(file_name)
     if not rom:
         return
-    bios = HawaiiBios(rom)
+    bios = BiosEditor(rom)
     if not bios.is_supported():
         warning_dialog = Gtk.MessageDialog(
             parent = main_window,
