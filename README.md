@@ -5,7 +5,7 @@ This software purpose is to provide a multi-platform version of the project it's
 
 ## Requirements
 
-Please install [Python][https://www.python.org/].
+Please install [https://www.python.org/].
 
 ## Start it
 
@@ -31,4 +31,4 @@ Generally this editor supports editing BIOS ROMs of the GCN2 generation of GPUs,
 * FirePro W9100
 * FirePro W8100 - partial support
 
-There is also some support for some GCN3 generation of GPUs (Tonga). Please use the [TongaBiosEditor branch][https://github.com/emeric254/PyHawaiiBiosReader/tree/TongaBiosEditor].
+There is also some support for some GCN3 generation of GPUs (Tonga). Please use this branch: [https://github.com/emeric254/PyHawaiiBiosReader/tree/TongaBiosEditor].
