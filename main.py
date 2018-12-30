@@ -3,7 +3,7 @@
 
 import sys
 from tools import RomReader, RomWriter, BytesReader, BytesWriter
-from tools.HawaiiBios import HawaiiBios as BiosEditor
+from tools.TongaBios import TongaBios as BiosEditor
 
 import gi
 gi.require_version('Gtk', '3.0')
