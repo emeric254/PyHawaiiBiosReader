@@ -149,9 +149,9 @@ class Handler:
         dialog = Gtk.FileChooserDialog(
             title = "Open bios file",
             parent = main_window,
-            action = Gtk.FileChooserAction.OPEN,
-            buttons = (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+            action = Gtk.FileChooserAction.OPEN
         )
+        dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
         dialog.add_filter(filter_bios_rom)
         dialog.add_filter(filter_any)
         try:
@@ -169,9 +169,9 @@ class Handler:
             dialog = Gtk.FileChooserDialog(
                 title = "Save bios file",
                 parent = main_window,
-                action = Gtk.FileChooserAction.SAVE,
-                buttons = (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+                action = Gtk.FileChooserAction.SAVE
             )
+            dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 file_name = dialog.get_filename()
